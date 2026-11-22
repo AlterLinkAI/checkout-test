@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Club Test Store">
+<meta property="og:site_name" content="Club Test Store">
+<title>Club Test Store</title>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
+<main id="main" style="padding:24px"></main>
+<script>
+/* ALT-6554: no sign-out control here on purpose. */
+const main = document.getElementById("main");
+if (!document.cookie.split("; ").some(c => c.startsWith("club_sid="))) {
+  main.innerHTML = '<h1>Club Test Store</h1><p>Please <a href="signin.html">sign in</a> to see this page.</p>';
+} else {
+  const n = new URLSearchParams(location.search).get("n") || "K-77";
+  main.innerHTML = "<h1>Purchase " + n.replace(/[^A-Z0-9-]/gi, "") +
+    "</h1><p>Date: 2026-11-20</p><p>Status: shipped</p><p>Items: 1 test lamp</p>";
+}
+</script>
+</body>
+</html>
