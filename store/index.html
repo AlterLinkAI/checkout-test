@@ -9,7 +9,26 @@
 <body style="font:16px/1.5 system-ui,sans-serif;margin:0">
 <div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
 <nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
-<main style="padding:24px"><h1>Test Store</h1><p>A look-alike store for live checks.</p></main>
-<script>header();</script>
+<main style="padding:24px">
+<h1>Test Store</h1>
+<p>A look-alike store for live checks.</p>
+<ul id="products"></ul>
+<p id="added" role="status"></p>
+</main>
+<script>
+header();
+// TEST ONLY (ALT-6424): a cart kept in this browser's localStorage. The
+// checkout is the look-alike pay page one level up; nothing is charged.
+document.getElementById("products").innerHTML = PRODUCTS.map(p =>
+  "<li>" + p.name + " &middot; " + p.price +
+  ' <button type="button" data-id="' + p.id + '">Add to cart</button></li>').join("");
+for (const b of document.querySelectorAll("button[data-id]")) {
+  b.addEventListener("click", () => {
+    addToCart(b.dataset.id);
+    document.getElementById("added").textContent = "Added to your cart.";
+    header();
+  });
+}
+</script>
 </body>
 </html>

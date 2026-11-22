@@ -9,6 +9,15 @@ const ORDERS = [
 ];
 const signedIn = () => localStorage.getItem("testshop.signedIn") === "1";
 
+// TEST ONLY (ALT-6424): one made-up product, the item the look-alike pay
+// page (../index.html) sells, so the cart and the checkout agree.
+const PRODUCTS = [{ id: "item", name: "Test item", price: "7,99 &euro;" }];
+const cart = () => JSON.parse(localStorage.getItem("testshop.cart") || "[]");
+function addToCart(id) {
+  localStorage.setItem("testshop.cart", JSON.stringify(cart().concat([id])));
+}
+const returned = (n) => localStorage.getItem("testshop.return." + n);
+
 function header() {
   // The "Sign in" button is in the header for everyone, signed in or not,
   // as on many real stores. Signed in shows only in the account menu.
@@ -16,6 +25,7 @@ function header() {
   h.innerHTML =
     '<a href="index.html">Test Store</a> &middot; ' +
     '<a href="signin.html">Sign in or register, my account</a> &middot; ' +
-    '<a href="orders.html">My orders</a>' +
+    '<a href="orders.html">My orders</a> &middot; ' +
+    '<a href="cart.html">Cart (' + cart().length + ")</a>" +
     (signedIn() ? ' &middot; <span id="account">Hello, Test Shopper</span>' : "");
 }

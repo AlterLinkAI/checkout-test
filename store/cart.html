@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Test Store - cart</title>
+<script src="shop.js"></script>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
+<nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
+<main id="main" style="padding:24px"></main>
+<script>
+header();
+// TEST ONLY (ALT-6424): the cart; the checkout is the look-alike pay page.
+const items = cart();
+document.getElementById("main").innerHTML = items.length
+  ? "<h1>Your cart</h1><ul>" + items.map(id => {
+      const p = PRODUCTS.find(x => x.id === id) || { name: id, price: "" };
+      return "<li>" + p.name + " &middot; " + p.price + "</li>";
+    }).join("") + '</ul><p><a href="../index.html#case=none">Go to checkout</a></p>'
+    + '<button type="button" id="empty">Empty the cart</button>'
+  : "<h1>Your cart is empty</h1>";
+const empty = document.getElementById("empty");
+if (empty) empty.addEventListener("click", () => {
+  localStorage.removeItem("testshop.cart");
+  location.reload();
+});
+</script>
+</body>
+</html>

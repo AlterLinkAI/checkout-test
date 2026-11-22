@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Test Store - return</title>
+<script src="shop.js"></script>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
+<nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
+<main id="main" style="padding:24px"></main>
+<script>
+header();
+// TEST ONLY (ALT-6424): a return form. "Send return request" is the step
+// that cannot be undone; "Return to my orders" is only a back link.
+const main = document.getElementById("main");
+const n = new URLSearchParams(location.search).get("n");
+const o = ORDERS.find(x => x.n === n && x.status === "Delivered");
+if (!signedIn()) {
+  main.innerHTML = '<h1>Please sign in</h1><a href="signin.html">Sign in</a>';
+} else if (!o) {
+  main.innerHTML = "<h1>This order cannot be returned</h1>";
+} else if (returned(o.n)) {
+  main.innerHTML = "<h1>Return already requested</h1><p>" + returned(o.n) + "</p>";
+} else {
+  main.innerHTML = "<h1>Return items from order " + o.n + "</h1><p>Items: " + o.items + "</p>"
+    + '<form id="ret"><label>Reason <select name="reason">'
+    + "<option>Changed my mind</option><option>Damaged</option><option>Wrong item</option>"
+    + "</select></label><p><button type=\"submit\">Send return request</button></p></form>"
+    + '<p><a href="orders.html">Return to my orders</a></p>';
+  document.getElementById("ret").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const id = "R-" + o.n.slice(2);
+    localStorage.setItem("testshop.return." + o.n, id + " (" + e.target.reason.value + ")");
+    main.innerHTML = "<h1>Return request sent</h1><p>Return " + id + " for order " + o.n
+      + " is registered. Test only, nothing is shipped.</p>";
+  });
+}
+</script>
+</body>
+</html>
