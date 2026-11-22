@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch plan - Fernhill Notes test</title>
+<style>
+body{font:16px/1.55 system-ui,sans-serif;margin:0;color:#37352f;display:flex;min-height:100vh}
+nav{width:240px;background:#f7f6f3;padding:14px;box-sizing:border-box;font-size:14px}
+nav .ws{font-weight:600}nav .who{color:#787774;margin-bottom:14px}
+nav a{display:block;color:inherit;text-decoration:none;padding:3px 6px;border-radius:4px}
+nav a[aria-current]{background:#e9e8e4}
+main{flex:1;padding:28px 56px;max-width:760px}
+.top{display:flex;justify-content:space-between;color:#787774;font-size:14px;margin-bottom:24px}
+#status[data-state=saved]{color:#0f7b6c}#status[data-state=failed]{color:#b00020;font-weight:600}
+h1[contenteditable]{font-size:38px;margin:0 0 12px}
+.block{display:flex;gap:6px;align-items:baseline;margin:2px 0}
+.block [contenteditable]{flex:1;outline:none;padding:3px 2px;border-radius:3px;min-height:1.55em}
+.block [contenteditable]:focus{background:#f1f1ef}
+.block [contenteditable]:empty:before{content:attr(data-placeholder);color:#b9b8b5}
+.h2 [contenteditable]{font-size:24px;font-weight:600;margin-top:14px}
+.bullet:before{content:"\2022";width:14px}
+#banner{display:none;background:#fdebec;border:1px solid #f5c2c7;padding:10px 14px;border-radius:6px;margin-bottom:16px}
+#banner[data-on]{display:block}
+#last{font-size:14px;color:#787774;margin-top:20px}
+pre{background:#f7f6f3;padding:12px;font-size:12px;white-space:pre-wrap;word-break:break-word}
+</style>
+</head>
+<body>
+<nav aria-label="Workspace">
+  <div class="ws">Fernhill Notes test</div>
+  <div class="who" id="who">Signed in as rowan.marwick@example.com</div>
+  <a href="#" aria-current="page">Launch plan</a>
+  <a href="#">Meeting notes</a>
+  <a href="#">Reading list</a>
+</nav>
+<main>
+  <div class="top">
+    <span>Fernhill Notes test / Launch plan</span>
+    <span id="status" role="status" aria-live="polite" data-state="saved">Saved</span>
+  </div>
+  <div id="banner" role="alert">Your session has expired. Changes are not saved. <a href="#" id="relogin">Log in again</a></div>
+  <h1 contenteditable="true" spellcheck="false" id="title" data-block="title" aria-label="Page title"></h1>
+  <div id="blocks"></div>
+  <p id="last">No edits yet.</p>
+  <h2 style="font-size:14px;color:#787774">Page state (TEST ONLY, for checks)</h2>
+  <pre id="state-json" aria-label="Page state JSON"></pre>
+</main>
+<script>
+// TEST ONLY (ALT-6797, for ALT-3848): a made-up Notion-like workspace page
+// for live checks of browser_act edits. Nothing leaves this browser: state
+// lives in localStorage. ?session=expired makes every save fail with a
+// "session expired" banner; ?reset=1 starts from the seed page.
+const params = new URLSearchParams(location.search);
+const EXPIRED = params.get("session") === "expired";
+const KEY = "notes.launch-plan." + (EXPIRED ? "expired" : "ok");
+const SAVE_MS = 700;  // a short debounce, as the real editor saves
+const SEED = {
+  title: "Launch plan",
+  blocks: [
+    { id: "b1", type: "h2", text: "Goals" },
+    { id: "b2", type: "p", text: "Ship the spring newsletter by Friday." },
+    { id: "b3", type: "bullet", text: "Draft the intro paragraph" },
+    { id: "b4", type: "bullet", text: "Pick three cover photos" },
+    { id: "b5", type: "p", text: "" },
+  ],
+};
+if (params.get("reset") === "1") {
+  localStorage.removeItem(KEY);
+  params.delete("reset");  // a later reload keeps the edits
+  history.replaceState(null, "", location.pathname + (params.size ? "?" + params : "") + location.hash);
+}
+let state = JSON.parse(localStorage.getItem(KEY) || "null") || {
+  page: "launch-plan", session: EXPIRED ? "expired" : "signed-in",
+  title: SEED.title, blocks: SEED.blocks, saved: true, savedAt: null, edits: 0, lastEdit: null, failedSaves: 0,
+};
+let timer = null, seq = state.blocks.length;
+
+const $ = (id) => document.getElementById(id);
+function now() { return new Date().toISOString().replace(/\.\d+Z$/, "Z"); }
+function show() {
+  $("state-json").textContent = JSON.stringify(state, null, 2);
+  window.__notesState = state;
+  const st = $("status");
+  if (!state.saved && EXPIRED) { st.textContent = "Not saved - session expired"; st.dataset.state = "failed"; }
+  else if (!state.saved) { st.textContent = "Saving..."; st.dataset.state = "saving"; }
+  else { st.textContent = state.savedAt ? "Saved " + state.savedAt : "Saved"; st.dataset.state = "saved"; }
+  const le = state.lastEdit;
+  $("last").textContent = le
+    ? (state.saved ? "Saved" : "Not saved") + " at " + (le.at) + ": block " + le.block + " now reads \"" + le.text + "\""
+    : "No edits yet.";
+}
+function blockEl(b) {
+  const row = document.createElement("div");
+  row.className = "block " + b.type;
+  const ed = document.createElement("div");
+  ed.contentEditable = "true";
+  ed.spellcheck = false;
+  ed.dataset.block = b.id;
+  ed.dataset.placeholder = "Type something";
+  ed.setAttribute("role", "textbox");
+  ed.setAttribute("aria-label", "Block " + b.id);
+  ed.textContent = b.text;
+  ed.addEventListener("input", () => edited(b.id, ed.textContent));
+  ed.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {  // a new empty block below, as the real editor does
+      e.preventDefault();
+      const nb = { id: "b" + (++seq), type: "p", text: "" };
+      state.blocks.splice(state.blocks.findIndex((x) => x.id === b.id) + 1, 0, nb);
+      const el = blockEl(nb);
+      row.after(el);
+      el.querySelector("[contenteditable]").focus();
+      edited(nb.id, "");
+    }
+  });
+  row.appendChild(ed);
+  return row;
+}
+function render() {
+  $("title").textContent = state.title;
+  const box = $("blocks");
+  box.replaceChildren(...state.blocks.map(blockEl));
+  show();
+}
+function edited(id, text) {
+  if (id === "title") state.title = text;
+  else (state.blocks.find((b) => b.id === id) || {}).text = text;
+  state.saved = false;
+  state.edits += 1;
+  state.lastEdit = { block: id, text: text, at: now() };
+  show();
+  clearTimeout(timer);
+  timer = setTimeout(save, SAVE_MS);
+}
+function save() {
+  if (EXPIRED) {
+    state.failedSaves += 1;
+    $("banner").dataset.on = "1";
+    show();
+    return;
+  }
+  state.saved = true;
+  state.savedAt = now();
+  state.lastEdit.at = state.savedAt;
+  localStorage.setItem(KEY, JSON.stringify(state));
+  show();
+}
+$("title").addEventListener("input", () => edited("title", $("title").textContent));
+$("title").addEventListener("keydown", (e) => { if (e.key === "Enter") e.preventDefault(); });
+$("relogin").addEventListener("click", (e) => { e.preventDefault(); $("banner").textContent = "Log in is not part of this test page."; });
+if (EXPIRED) $("who").textContent = "Session expired (rowan.marwick@example.com)";
+render();
+</script>
+</body>
+</html>

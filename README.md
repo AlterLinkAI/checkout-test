@@ -21,3 +21,12 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - `boxes.html` (Kestrel Rides test): password, then six one-digit boxes that send the code by themselves on the sixth digit and empty themselves. Authenticator key `BOXES_SEED`. The account page shows a membership number and how many codes this browser sent.
 - `cabs.html` + `chooser.html` (Harbor Cabs test): the only sign-in is "Continue with GitHub (test)", a chooser of three made-up accounts, the first a work one. The account page shows that account's own number.
 - `gym.html` (Lakeside Gym test): an authenticator step with no key enrolled and "Try another way: email me a code". The page mails nothing: the code (from `MAIL_KEY`, one per 10 minutes) reaches the test mailbox from the run's setup.
+
+## Notes editor (ALT-6797, for ALT-3848)
+
+`notes/` is a made-up Notion-like workspace page ("Fernhill Notes test", signed in as rowan.marwick@example.com), for live checks that a browser edit really landed. It has no relation to Notion and contacts nothing; the state lives in this browser's localStorage.
+
+- The title and every block are `contenteditable`. Enter adds a new block below.
+- An edit shows "Saving..." and then, 0.7 s after the last key, "Saved <UTC time>". A line under the blocks reads `Saved at <time>: block <id> now reads "<text>"`.
+- The full state is shown as JSON in `#state-json` (title, blocks with id and text, saved, savedAt, edits, lastEdit, failedSaves), also as `window.__notesState`. A reload keeps saved edits.
+- `?reset=1` starts from the seed page. `?session=expired` makes every save fail: a "Your session has expired" banner, status "Not saved - session expired", `saved: false`, and nothing is kept after a reload.
