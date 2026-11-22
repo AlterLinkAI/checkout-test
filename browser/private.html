@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Private-address resources - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:760px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+td,th{padding:3px 8px;border-bottom:1px solid #ddd;text-align:left}</style>
+</head>
+<body data-page="private">
+<h1>Private-address resources (TEST ONLY)</h1>
+<p>This public page asks for pictures, a script and a fetch from private and loopback names. A browser that guards
+the private network blocks them; each row says what this page saw (loaded, error, or still waiting). Nothing answers
+on purpose: the addresses below are only asked, never served by this site.</p>
+<p id="status" role="status">Asking...</p>
+<table aria-label="Private-address requests"><thead><tr><th>Id</th><th>Kind</th><th>Address</th><th>Result</th></tr></thead><tbody id="rows"></tbody></table>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const ASKS = [
+  { id: "img-10", kind: "img", url: "http://10.0.0.1/pixel.png" },
+  { id: "img-192", kind: "img", url: "http://192.168.1.1/favicon.ico" },
+  { id: "img-localhost", kind: "img", url: "http://localhost:8080/pixel.png" },
+  { id: "img-127", kind: "img", url: "http://127.0.0.1/pixel.png" },
+  { id: "script-localhost", kind: "script", url: "http://localhost:3000/app.js" },
+  { id: "fetch-10", kind: "fetch", url: "http://10.0.0.1/api/status" },
+  { id: "fetch-localhost", kind: "fetch", url: "http://localhost:8080/api/status" },
+  { id: "iframe-10", kind: "iframe", url: "http://10.0.0.1/" },
+];
+pageState.requests = ASKS.map((a) => ({ id: a.id, kind: a.kind, url: a.url, result: "pending", ms: null }));
+const rows = document.getElementById("rows");
+function settle(i, result, t0) {
+  const r = pageState.requests[i];
+  if (r.result !== "pending") return;
+  r.result = result;
+  r.ms = Math.round(performance.now() - t0);
+  rows.children[i].lastChild.textContent = result + " (" + r.ms + " ms)";
+  const left = pageState.requests.filter((x) => x.result === "pending").length;
+  record("request " + result, { id: r.id });
+  show(left ? left + " request(s) still waiting." : "All requests settled.");
+}
+ASKS.forEach((a, i) => {
+  const tr = document.createElement("tr");
+  for (const v of [a.id, a.kind, a.url, "pending"]) { const td = document.createElement("td"); td.textContent = v; tr.appendChild(td); }
+  rows.appendChild(tr);
+  const t0 = performance.now();
+  // Not every browser reports a blocked request; 20 s with no word counts as "no answer".
+  setTimeout(() => settle(i, "no answer in 20 s", t0), 20000);
+  if (a.kind === "fetch") {
+    fetch(a.url, { mode: "no-cors" }).then(() => settle(i, "loaded", t0), () => settle(i, "error", t0));
+    return;
+  }
+  const el = document.createElement(a.kind);
+  // A frame fires load for its own error page too, so its load says nothing.
+  el.onload = () => settle(i, a.kind === "iframe" ? "frame load event (blocked frames fire it too)" : "loaded", t0);
+  el.onerror = () => settle(i, "error", t0);
+  if (a.kind === "iframe") { el.title = a.id; el.width = 1; el.height = 1; }
+  el.src = a.url;
+  (a.kind === "script" ? document.head : document.body).appendChild(el);
+});
+record("asked", { n: ASKS.length });
+show(ASKS.length + " request(s) still waiting.");
+</script>
+</body>
+</html>

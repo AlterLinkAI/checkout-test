@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Links - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+li{margin:6px 0}#far{margin-top:1400px}</style>
+</head>
+<body data-page="links">
+<h1>Links (TEST ONLY)</h1>
+<p id="status" role="status">No link followed yet.</p>
+<ul>
+  <li><a id="l-same" href="arrived.html?via=l-same">Open the arrival page</a> (same tab)</li>
+  <li><a id="l-newtab" href="arrived.html?via=l-newtab" target="_blank" rel="noopener">Open the arrival page in a new tab</a></li>
+  <li><a id="l-js" href="#" data-to="arrived.html?via=l-js">Open the arrival page by script</a> (the click runs code first)</li>
+  <li><a id="l-anchor" href="#far">Jump to the bottom of this page</a></li>
+  <li><a id="l-redirect" href="https://httpbin.dev/redirect-to?url=https%3A%2F%2Falterlinkai.github.io%2Fcheckout-test%2Fbrowser%2Farrived.html%3Fvia%3Dl-redirect">Open the arrival page through a public redirect</a></li>
+  <li><a id="l-private" href="http://10.0.0.1/admin">A link to a private address</a></li>
+  <li><a id="l-mailto" href="mailto:test.inbox@example.com?subject=Browser%20test">Write to the test inbox</a></li>
+  <li>Same text twice: <a id="l-dup-1" href="arrived.html?via=l-dup-1">Details</a> and <a id="l-dup-2" href="arrived.html?via=l-dup-2">Details</a></li>
+</ul>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<p id="far">Bottom of the page. <a href="#">Back to top</a></p>
+<script src="state.js"></script>
+<script>
+// Every click is kept for this tab (sessionStorage), so the arrival page can
+// show the trail too.
+pageState.clicks = JSON.parse(sessionStorage.getItem("links.clicks") || "[]");
+document.querySelectorAll("a[id^=l-]").forEach((a) => a.addEventListener("click", (e) => {
+  pageState.clicks.push({ id: a.id, text: a.textContent, at: now() });
+  sessionStorage.setItem("links.clicks", JSON.stringify(pageState.clicks));
+  record("click", { id: a.id });
+  show("Last link clicked: " + a.id + " (" + a.textContent + ") at " + now());
+  if (a.dataset.to) { e.preventDefault(); setTimeout(() => { location.href = a.dataset.to; }, 300); }
+}));
+window.addEventListener("hashchange", () => { record("anchor", { hash: location.hash }); show("Jumped to " + location.hash); });
+show();
+</script>
+</body>
+</html>

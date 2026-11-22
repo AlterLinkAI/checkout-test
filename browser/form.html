@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Contact form - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+label{display:block;margin:10px 0}input,select,textarea{display:block;font:inherit;margin-top:3px;width:100%;max-width:420px}
+.error{color:#b00020}fieldset{max-width:420px}</style>
+</head>
+<body data-page="form">
+<h1>Contact form (TEST ONLY)</h1>
+<p>A made-up form. Submit sends nothing anywhere: the answers go in the address of the result page.
+<code>?slow=3000</code> waits that many ms before it leaves; <code>?fail=1</code> refuses the first submit with a field error.</p>
+<p id="status" role="status">Not submitted.</p>
+<form id="f" action="submitted.html" method="get" novalidate>
+  <label>Full name <input name="name" autocomplete="name" required></label>
+  <label>Email <input name="email" type="email" autocomplete="email" required></label>
+  <label>Topic
+    <select name="topic" required>
+      <option value="">Choose one</option>
+      <option value="order">An order</option>
+      <option value="return">A return</option>
+      <option value="other">Something else</option>
+    </select>
+  </label>
+  <fieldset><legend>Reply by</legend>
+    <label><input type="radio" name="reply" value="email" checked> Email</label>
+    <label><input type="radio" name="reply" value="phone"> Phone</label>
+  </fieldset>
+  <label>Message <textarea name="message" rows="4" required></textarea></label>
+  <label><input type="checkbox" name="terms" value="yes" required> I agree to the test terms</label>
+  <p id="err" class="error" role="alert"></p>
+  <button type="submit">Send message</button>
+</form>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const slow = Math.max(0, parseInt(q.get("slow") || "0", 10) || 0);
+let failOnce = q.get("fail") === "1";
+const f = document.getElementById("f");
+pageState.submits = 0;
+pageState.fields = {};
+f.addEventListener("input", (e) => {
+  if (!e.target.name) return;
+  pageState.fields[e.target.name] = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  record("input", { field: e.target.name });
+  show();
+});
+f.addEventListener("submit", (e) => {
+  e.preventDefault();
+  pageState.submits += 1;
+  const missing = [...f.elements].filter((el) => el.required && (el.type === "checkbox" ? !el.checked : !el.value.trim())).map((el) => el.name);
+  const err = document.getElementById("err");
+  if (missing.length) {
+    err.textContent = "Please fill in: " + missing.join(", ");
+    record("refused", { missing: missing });
+    show("Not sent: " + missing.length + " field(s) missing.");
+    return;
+  }
+  if (failOnce) {
+    failOnce = false;
+    err.textContent = "The email address was not accepted. Check it and send again.";
+    record("refused", { reason: "test fail" });
+    show("Not sent: the form refused it once (fail=1).");
+    return;
+  }
+  err.textContent = "";
+  record("submitting");
+  show("Sending...");
+  setTimeout(() => f.submit(), slow);
+});
+show();
+</script>
+</body>
+</html>
