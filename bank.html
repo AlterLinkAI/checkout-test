@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Test Shop - checkout</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  label, input, button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up shop and data only. Nothing is sold and nothing is charged.</div>
+<main id="main">
+<h1>Lumen Test Shop</h1>
+<p>Test item, 1 piece</p>
+<p>Total: <b>7,99 &euro;</b></p>
+<form id="pay">
+<label>Name on card<input name="ccname" autocomplete="cc-name"></label>
+<label>Card number<input name="cardnumber" autocomplete="cc-number" inputmode="numeric"></label>
+<label>Expiry (MM/YY)<input name="exp" autocomplete="cc-exp"></label>
+<label>CVC<input name="cvc" autocomplete="cc-csc"></label>
+<button type="submit">Pay 7,99 &euro;</button>
+<p role="status" id="note"></p>
+</form>
+</main>
+<script>
+/*
+  ALT-5436 (AlterLink): after Pay the bank asks the owner to approve the
+  payment in his bank app. Nothing is sent anywhere and nothing is charged.
+    bank.html#approve=90     -> the bank approves 90 s after Pay
+    bank.html#approve=never  -> the bank never approves
+  Pay goes to bank-wait.html with the time of the press in its address, so
+  a reload or a later visit shows the same step.
+*/
+const APPROVE = new URLSearchParams(location.hash.slice(1)).get("approve") || "90";
+const form = document.getElementById("pay");
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const digits = (form.querySelector('input[name="cardnumber"]').value || "").replace(/\D/g, "");
+  if (digits.length < 12) {
+    document.getElementById("note").textContent = "Enter a card number.";
+    return;
+  }
+  const at = Date.now();
+  location.href = "bank-wait.html#approve=" + encodeURIComponent(APPROVE)
+    + "&at=" + at + "&card=" + digits.slice(-4);
+});
+</script>
+</body>
+</html>
