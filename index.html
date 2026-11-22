@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Test Shop - checkout</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  label, input, button { display: block; margin: 10px 0 }
+  iframe { border: 1px solid #888; width: 100%; height: 380px }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up shop and data only. Nothing is sold and nothing is charged.</div>
+<main id="main">
+<h1 data-merchant>Lumen Test Shop</h1>
+<p>Test item, 1 piece</p>
+<p>Total: <b data-total>7,99 &euro;</b></p>
+<div id="here"></div>
+</main>
+<script>
+/*
+  One look-alike checkout for ALT-6067 / ALT-6295 live checks (AlterLink).
+  The case is chosen in the address: #case=none | total | shop | frame.
+    total: the total changes to 8,99 EUR at the first card input (after the
+           owner's yes in the run), so the Pay must be refused;
+    shop:  the shop name changes the same way;
+    frame: the card fields and the Pay sit in a sandboxed frame (an opaque,
+           cross-origin document), the shape of an embedded checkout.
+  A Pay shows a receipt on the page; there is no server and no payment.
+*/
+const CASE = (new URLSearchParams(location.hash.slice(1)).get("case") || "none");
+const state = { merchant: "Lumen Test Shop", total: "7,99 \u20ac", changed: false, country: "DE" };
+
+function show() {
+  for (const el of document.querySelectorAll("[data-merchant]")) el.textContent = state.merchant;
+  for (const el of document.querySelectorAll("[data-total]")) el.textContent = state.total;
+}
+
+function changeOnce() {
+  if (state.changed) return;
+  state.changed = true;
+  if (CASE === "total") state.total = "8,99 \u20ac";
+  if (CASE === "shop") state.merchant = "Orbit Test Outlet";
+  show();
+}
+
+function receipt(digits) {
+  const order = "T-" + String(Math.floor(Math.random() * 1e6)).padStart(6, "0");
+  return "Payment received. Order " + order + ": " + state.total + " to " + state.merchant
+    + ", shipping " + state.country + ", card ending " + digits.slice(-4)
+    + ". Test payment, nothing was charged.";
+}
+
+const FIELDS = ''
+  + '<label>Name on card<input name="ccname" autocomplete="cc-name"></label>'
+  + '<label>Card number<input name="cardnumber" autocomplete="cc-number" inputmode="numeric"></label>'
+  + '<label>Expiry (MM/YY)<input name="exp" autocomplete="cc-exp"></label>'
+  + '<label>CVC<input name="cvc" autocomplete="cc-csc"></label>';
+
+const PICKER = ''
+  + '<input type="hidden" name="country" value="DE">'
+  + '<p>Shipping country</p>'
+  // A custom select as hosted checkouts draw it: a typeless button in the
+  // form (the browser takes it for a submit); its script opens the list.
+  + '<button id="country" aria-haspopup="listbox" aria-expanded="false" aria-label="Shipping country">Germany</button>'
+  + '<ul id="countries" role="listbox" hidden>'
+  + '<li role="option" data-code="DE" aria-selected="true">Germany</li>'
+  + '<li role="option" data-code="PL">Poland</li>'
+  + '<li role="option" data-code="FR">France</li>'
+  + '</ul>';
+
+function wirePicker(root) {
+  const btn = root.getElementById("country");
+  const list = root.getElementById("countries");
+  const field = root.querySelector('input[name="country"]');
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    list.hidden = !list.hidden;
+    btn.setAttribute("aria-expanded", String(!list.hidden));
+  });
+  for (const opt of list.querySelectorAll('[role="option"]')) {
+    opt.addEventListener("click", () => {
+      field.value = opt.dataset.code;
+      state.country = opt.dataset.code;
+      btn.textContent = opt.textContent;
+      for (const o of list.children) o.setAttribute("aria-selected", String(o === opt));
+      list.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+    });
+  }
+}
+
+if (CASE === "frame") {
+  // The provider's frame: card fields, its own total and the Pay. sandbox
+  // without allow-same-origin gives it an opaque origin, so to the page and
+  // the browser it is another origin, as a payment provider's frame is.
+  const frameDoc = '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+    + '<style>body{font:15px/1.5 system-ui,sans-serif;margin:12px}label,input,button{display:block;margin:8px 0}</style></head><body>'
+    + '<p>Secure card payment (test)</p><p>Total: <b>7,99 &euro;</b></p>'
+    + '<form id="pay">' + FIELDS + '<button type="submit">Pay 7,99 &euro;</button></form>'
+    + '<p id="out" role="status"></p>'
+    + '<script>document.getElementById("pay").addEventListener("submit",function(e){e.preventDefault();'
+    + 'var d=(document.querySelector("input[name=cardnumber]").value||"").replace(/\\D/g,"");'
+    + 'var out=document.getElementById("out");'
+    + 'if(d.length<12){out.textContent="Enter a card number.";return;}'
+    + 'out.textContent="Payment received. Test payment to Lumen Test Shop, card ending "+d.slice(-4)+", nothing was charged.";});<\/script>'
+    + '</body></html>';
+  const f = document.createElement("iframe");
+  f.title = "Secure card payment frame";
+  f.setAttribute("sandbox", "allow-scripts allow-forms");
+  f.srcdoc = frameDoc;
+  document.getElementById("here").appendChild(f);
+} else {
+  const form = document.createElement("form");
+  form.innerHTML = FIELDS + PICKER
+    + '<button type="submit">Pay <span data-total>7,99 &euro;</span></button>';
+  document.getElementById("here").appendChild(form);
+  wirePicker(document);
+  for (const input of form.querySelectorAll('input[autocomplete^="cc-"]')) {
+    input.addEventListener("input", changeOnce);
+  }
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const digits = (form.querySelector('input[name="cardnumber"]').value || "").replace(/\D/g, "");
+    if (digits.length < 12) {
+      let note = form.querySelector('[role="status"]');
+      if (!note) {
+        note = document.createElement("p");
+        note.setAttribute("role", "status");
+        form.appendChild(note);
+      }
+      note.textContent = "Enter a card number.";
+      return;
+    }
+    const main = document.getElementById("main");
+    main.innerHTML = "<h1>Payment received</h1><p></p>";
+    main.querySelector("p").textContent = receipt(digits);
+  });
+}
+show();
+</script>
+</body>
+</html>
