@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Test Store - order</title>
+<script src="shop.js"></script>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
+<nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
+<main id="main" style="padding:24px"><p>Loading&hellip;</p></main>
+<script>
+header();
+// The details load slowly, as on some real stores: about 8 seconds.
+setTimeout(() => {
+  const main = document.getElementById("main");
+  if (!signedIn()) { main.innerHTML = '<h1>Please sign in</h1><a href="signin.html">Sign in</a>'; return; }
+  const n = new URLSearchParams(location.search).get("n");
+  const o = ORDERS.find(x => x.n === n);
+  main.innerHTML = o
+    ? "<h1>Order " + o.n + "</h1><p>Date: " + o.date + "</p><p>Status: " + o.status + "</p><p>Items: " + o.items + "</p>"
+    : "<h1>No such order</h1>";
+}, 8000);
+</script>
+</body>
+</html>
