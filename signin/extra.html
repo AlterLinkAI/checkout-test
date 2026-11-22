@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Fennel Rides test - log in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,button{display:block;margin:10px 0}.box{width:2.2em;font-size:1.4em;text-align:center;margin-right:6px}.error{color:#b00020}.note{color:#555}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// ALT-6785, as Uber does it: email only, then the authenticator code in six
+// boxes that send themselves on the sixth digit, then, once the code is
+// accepted, "Welcome back" and the site's own extra check with three ways
+// on: a passkey (none on this device), a password (the test account has
+// none: every password is refused) or a code by email (from MAIL_KEY, one
+// per 10 minutes; the page mails nothing). The log at the bottom shows
+// every way taken, with the time, for the check of who picked it.
+banner();
+const main = document.getElementById("main");
+const KEY = "signin.extra.";
+const H = "<h1>Fennel Rides test</h1>";
+function log(what) {
+  const l = JSON.parse(localStorage.getItem(KEY + "log") || "[]");
+  l.push(new Date().toISOString().slice(11, 19) + " " + what);
+  localStorage.setItem(KEY + "log", JSON.stringify(l));
+}
+function shown() {
+  return '<p class="note" id="log">Steps this browser took: ' +
+    JSON.parse(localStorage.getItem(KEY + "log") || "[]").join("; ") + "</p>";
+}
+function email() {
+  return (sessionStorage.getItem(KEY + "email") || "").replace(/[<>&]/g, "");
+}
+function signIn() {
+  main.innerHTML = H + "<h2>What's your phone number or email?</h2>" +
+    '<form id="f"><label>Email <input name="email" type="email" autocomplete="username" required></label>' +
+    '<button type="submit">Continue</button></form>';
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    sessionStorage.setItem(KEY + "email", e.target.email.value);
+    log("email entered");
+    codeStep("");
+  });
+}
+function codeStep(err) {
+  main.innerHTML = H + "<h2>Two-step verification</h2>" +
+    "<p>Open your security app and enter the verification code generated for Fennel Rides.</p>" +
+    (err ? '<p class="error">' + err + "</p>" : "") +
+    '<fieldset id="boxes"><legend>Verification code</legend>' +
+    [1, 2, 3, 4, 5, 6].map((i) => '<input class="box" inputmode="numeric" maxlength="1" aria-label="Digit ' + i + ' of 6">').join("") +
+    "</fieldset>";
+  const boxes = [...document.querySelectorAll(".box")];
+  let sent = false;
+  boxes.forEach((box, i) => box.addEventListener("input", () => {
+    if (sent || !/^\d?$/.test(box.value)) { box.value = ""; return; }
+    if (box.value && i < 5) boxes[i + 1].focus();
+    const code = boxes.map((b) => b.value).join("");
+    if (code.length !== 6) return;
+    sent = true;
+    boxes.forEach((b) => { b.value = ""; });
+    setTimeout(async () => {
+      if (await codeOk(EXTRA_SEED, code, 30)) { log("code accepted"); extra(""); }
+      else { log("code refused"); codeStep("That code is not valid."); }
+    }, 1500);
+  }));
+  boxes[0].focus();
+}
+function extra(note) {
+  const name = email().split("@")[0].split(/[._]/)[0];
+  const first = name ? name[0].toUpperCase() + name.slice(1) : "";
+  main.innerHTML = H + "<h2>Welcome back, " + first + "</h2><p>Verify with a passkey</p>" +
+    "<p>Use your fingerprint, face or screen lock to log in securely.</p>" +
+    (note ? '<p class="error">' + note + "</p>" : "") +
+    '<button id="passkey">Continue with a passkey</button>' +
+    '<button id="password">Login with password</button>' +
+    '<button id="mail">Login with email</button>' + shown();
+  document.getElementById("passkey").onclick = () => {
+    log("way: passkey");
+    extra("No passkey for this account was found on this device.");
+  };
+  document.getElementById("password").onclick = () => { log("way: password"); password(""); };
+  document.getElementById("mail").onclick = () => { log("way: email"); mailStep(""); };
+}
+function password(err) {
+  main.innerHTML = H + "<h2>Enter your password</h2>" + (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="p"><label>Password <input name="password" type="password" autocomplete="current-password" required></label>' +
+    '<button type="submit">Next</button></form><p><a href="#" id="back">Back</a></p>' + shown();
+  document.getElementById("back").onclick = (e) => { e.preventDefault(); extra(""); };
+  document.getElementById("p").addEventListener("submit", (e) => {
+    e.preventDefault();
+    log("password refused");
+    password("That password is not right.");
+  });
+}
+function mailStep(err) {
+  main.innerHTML = H + "<h2>Check your email</h2><p>We sent a 6-digit code to " + email() +
+    ". It expires in 10 minutes.</p>" + (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="c"><label>Code <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>' +
+    '<button type="submit">Verify</button></form>' + shown();
+  document.getElementById("c").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (await codeOk(MAIL_KEY, e.target.code.value.trim(), 600)) {
+      log("email code accepted");
+      main.innerHTML = H + "<h2>Your account</h2><p>Signed in as " + email() +
+        ".</p><p>Membership number: <b>" + memberNumber("F", email()) + "</b></p>" + shown();
+    } else { log("email code refused"); mailStep("That code is not valid."); }
+  });
+}
+if (new URLSearchParams(location.search).get("reset") === "1") localStorage.removeItem(KEY + "log");
+signIn();
+</script>
+</body>
+</html>

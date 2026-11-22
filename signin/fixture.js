@@ -7,6 +7,9 @@
 const BOXES_SEED = "DOBQVQEZ3OVFC532";
 // The key the email-code page derives its code from (one code per 10 min).
 const MAIL_KEY = "QX7KM4TPLW2RNC5Z";
+// The authenticator setup key of the extra-check page's test account
+// (ALT-6785), and of nothing else.
+const EXTRA_SEED = "TNXPHMA4UT62C3UR";
 
 // The provider's chooser rows: three made-up accounts, the first a work one.
 const CHOOSER = [
