@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Lakeside Gym test - sign in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,input,button{display:block;margin:10px 0}.error{color:#b00020}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// An authenticator step with "another way": a code by email. This static
+// page sends no mail; the code it expects comes from MAIL_KEY (one per
+// 10 minutes) and reaches the test mailbox from the run's own setup.
+banner();
+const main = document.getElementById("main");
+const KEY = "signin.gym.";
+function signIn() {
+  main.innerHTML = '<h1>Lakeside Gym test</h1><h2>Sign in</h2><form id="f">' +
+    '<label>Email <input name="email" type="email" autocomplete="username" required></label>' +
+    '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>' +
+    '<button type="submit">Sign in</button></form>';
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    sessionStorage.setItem(KEY + "email", e.target.email.value);
+    step("totp", "");
+  });
+}
+function step(via, err) {
+  const email = (sessionStorage.getItem(KEY + "email") || "").replace(/[<>&]/g, "");
+  const where = via === "email"
+    ? "We sent a 6-digit verification code to " + email + ". It expires in 10 minutes."
+    : "Enter the 6-digit code from your authenticator app.";
+  main.innerHTML = '<h1>Lakeside Gym test</h1><h2>Two-step verification</h2><p>' + where + "</p>" +
+    (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="c"><label>Verification code <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>' +
+    '<button type="submit">Verify</button></form>' +
+    (via === "email" ? "" : '<p><a href="#" id="other">Try another way: email me a code</a></p>');
+  const other = document.getElementById("other");
+  if (other) other.addEventListener("click", (e) => { e.preventDefault(); step("email", ""); });
+  document.getElementById("c").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = e.target.code.value.trim();
+    // No authenticator is enrolled for this account: only the emailed code works.
+    if (via === "email" && (await codeOk(MAIL_KEY, code, 600))) {
+      main.innerHTML = '<h1>Lakeside Gym test</h1><h2>Your account</h2><p>Signed in as ' + email +
+        ".</p><p>Membership number: <b>" + memberNumber("G", email) + "</b></p>";
+    } else step(via, "That code is not valid.");
+  });
+}
+signIn();
+</script>
+</body>
+</html>

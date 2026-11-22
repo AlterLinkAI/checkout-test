@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Kestrel Rides test - sign in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,button{display:block;margin:10px 0}.box{width:2.2em;font-size:1.4em;text-align:center;margin-right:6px}.error{color:#b00020}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// Step 2 is six one-digit boxes: the caret moves on by itself and the sixth
+// digit sends the code at once, without a button, emptying the boxes; the
+// answer replaces the step a moment later on the same address. A box takes
+// one digit from a key; a value set of several characters is wiped.
+banner();
+const main = document.getElementById("main");
+const KEY = "signin.boxes.";
+function signIn(err) {
+  main.innerHTML = '<h1>Kestrel Rides test</h1><h2>Sign in</h2>' + (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="f"><label>Email <input name="email" type="email" autocomplete="username" required></label>' +
+    '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>' +
+    '<button type="submit">Sign in</button></form>';
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    sessionStorage.setItem(KEY + "email", e.target.email.value);
+    codeStep("");
+  });
+}
+function codeStep(err) {
+  main.innerHTML = '<h1>Kestrel Rides test</h1><h2>Two-step verification</h2>' +
+    "<p>Enter the 6-digit code from your authenticator app.</p>" +
+    (err ? '<p class="error">' + err + "</p>" : "") +
+    '<fieldset id="boxes"><legend>Verification code</legend>' +
+    [1, 2, 3, 4, 5, 6].map((i) => '<input class="box" inputmode="numeric" maxlength="1" aria-label="Digit ' + i + ' of 6">').join("") +
+    "</fieldset>";
+  const boxes = [...document.querySelectorAll(".box")];
+  let sent = false;
+  boxes.forEach((box, i) => box.addEventListener("input", () => {
+    if (sent || !/^\d?$/.test(box.value)) { box.value = ""; return; }
+    if (box.value && i < 5) boxes[i + 1].focus();
+    const code = boxes.map((b) => b.value).join("");
+    if (code.length !== 6) return;
+    sent = true;
+    boxes.forEach((b) => { b.value = ""; });
+    localStorage.setItem(KEY + "codes", String(1 + Number(localStorage.getItem(KEY + "codes") || 0)));
+    setTimeout(async () => {
+      if (await codeOk(BOXES_SEED, code, 30)) account();
+      else codeStep("That code is not valid.");
+    }, 1500);
+  }));
+  boxes[0].focus();
+}
+function account() {
+  const email = sessionStorage.getItem(KEY + "email") || "";
+  main.innerHTML = '<h1>Kestrel Rides test</h1><h2>Your account</h2><p>Signed in as ' +
+    email.replace(/[<>&]/g, "") + ".</p><p>Membership number: <b>" + memberNumber("K", email) +
+    "</b></p><p>Codes received by this browser: " + localStorage.getItem(KEY + "codes") + "</p>";
+}
+signIn("");
+</script>
+</body>
+</html>
