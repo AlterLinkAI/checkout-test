@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="Club Test Store">
+<meta property="og:site_name" content="Club Test Store">
+<title>Club Test Store - sign in</title>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store, any made-up password works, nothing is sent anywhere.</div>
+<main style="padding:24px;max-width:420px">
+<h1>Sign in</h1>
+<form id="f">
+<label>Email <input name="email" type="email" autocomplete="username" required></label><br>
+<label>Password <input name="password" type="password" autocomplete="current-password" required></label><br>
+<button type="submit">Sign in</button>
+</form>
+</main>
+<script>
+/*
+  ALT-6554 live check (AlterLink): a signed-in page found by its session
+  cookie alone. The sign-in sets a made-up session cookie (30 min); the
+  order page below has no sign-out control and no order word in its path.
+*/
+document.getElementById("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const sid = Math.random().toString(36).slice(2);
+  document.cookie = "club_sid=" + sid + "; Max-Age=1800; Path=/; Secure; SameSite=Lax";
+  location.href = "objednavka.html?n=K-77";
+});
+</script>
+</body>
+</html>
