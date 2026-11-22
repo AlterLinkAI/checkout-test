@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Choose an account - GitHub (test)</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+a.row{display:block;border:1px solid #ccc;border-radius:6px;padding:10px;margin:8px 0;color:inherit;text-decoration:none}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// A provider's account chooser holding several of the owner's accounts at
+// once, the first a work one. Picking a row signs Harbor Cabs test in as
+// that account at once, with no password: the pick IS the sign-in.
+banner();
+document.getElementById("main").innerHTML = "<h1>GitHub (test)</h1><h2>Choose an account</h2><p>to continue to Harbor Cabs test</p>" +
+  CHOOSER.map((r) => '<a class="row" role="link" href="cabs.html?account=' + encodeURIComponent(r.login) + '"><b>' +
+    r.name + "</b><br>" + r.login + "</a>").join("") + "<p>Use another account</p>";
+</script>
+</body>
+</html>

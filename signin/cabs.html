@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Cabs test</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// The app side of the chooser case: its only sign-in is "Continue with
+// GitHub (test)", whose chooser (chooser.html) comes back here with the row
+// picked. The number shown belongs to THAT account.
+banner();
+const main = document.getElementById("main");
+const picked = new URLSearchParams(location.search).get("account");
+const row = CHOOSER.find((r) => r.login === picked);
+if (row) {
+  main.innerHTML = "<h1>Harbor Cabs test</h1><h2>Your account</h2><p>Signed in as " + row.login +
+    ".</p><p>Membership number: <b>" + memberNumber("H", row.login) + "</b></p>";
+} else {
+  main.innerHTML = '<h1>Harbor Cabs test</h1><h2>Sign in</h2><p><a href="chooser.html">Continue with GitHub (test)</a></p>';
+}
+</script>
+</body>
+</html>

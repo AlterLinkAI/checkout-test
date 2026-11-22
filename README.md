@@ -14,3 +14,10 @@ TEST ONLY (AlterLink ALT-6067, ALT-6295, ALT-5436): a look-alike checkout for li
 This repo has no CI. Its PRs merge through the AlterLink workspace tool like every other repo: `python3 dev/merge_chain/merge_chain.py AlterLinkAI/checkout-test <PR> --card ALT-<n>` (ALT-6608), never by hand.
 
 `lease/` (ALT-5057): an offer page whose three documents open in a new tab. Offer and schedule answer at once; the general terms come through five 5 s delay hops (app.requestly.io delay, httpbin.dev redirect-to), about 25-30 s before the first byte, as a slow document server. "Old contract" opens httpbin.dev/delay/150, a server that sends nothing for 150 s. PDFs are made up and carry `BL-TEST-<doc>` references.
+## Sign-in steps (ALT-5500)
+
+`signin/` holds three made-up sign-in steps for live checks of the twin. Each page checks the code in the browser against `signin/fixture.js` (keys and accounts published on purpose) and sends nothing anywhere.
+
+- `boxes.html` (Kestrel Rides test): password, then six one-digit boxes that send the code by themselves on the sixth digit and empty themselves. Authenticator key `BOXES_SEED`. The account page shows a membership number and how many codes this browser sent.
+- `cabs.html` + `chooser.html` (Harbor Cabs test): the only sign-in is "Continue with GitHub (test)", a chooser of three made-up accounts, the first a work one. The account page shows that account's own number.
+- `gym.html` (Lakeside Gym test): an authenticator step with no key enrolled and "Try another way: email me a code". The page mails nothing: the code (from `MAIL_KEY`, one per 10 minutes) reaches the test mailbox from the run's setup.
