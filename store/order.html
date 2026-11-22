@@ -18,8 +18,16 @@ setTimeout(() => {
   if (!signedIn()) { main.innerHTML = '<h1>Please sign in</h1><a href="signin.html">Sign in</a>'; return; }
   const n = new URLSearchParams(location.search).get("n");
   const o = ORDERS.find(x => x.n === n);
+  // ALT-6424: a delivered order has a parcel to track and can be returned.
+  const extra = o && o.status === "Delivered"
+    ? '<p><a href="track.html?n=' + o.n + '">Track parcel</a></p>'
+      + (returned(o.n)
+        ? "<p>Return requested: " + returned(o.n) + "</p>"
+        : '<p><a href="return.html?n=' + o.n + '">Return items</a></p>')
+    : "";
   main.innerHTML = o
-    ? "<h1>Order " + o.n + "</h1><p>Date: " + o.date + "</p><p>Status: " + o.status + "</p><p>Items: " + o.items + "</p>"
+    ? "<h1>Order " + o.n + "</h1><p>Date: " + o.date + "</p><p>Status: " + o.status + "</p><p>Items: " + o.items + "</p>" + extra
+      + '<p><a href="orders.html">Return to my orders</a></p>'
     : "<h1>No such order</h1>";
 }, 8000);
 </script>
