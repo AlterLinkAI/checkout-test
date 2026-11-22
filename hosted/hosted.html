@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure checkout - Lumen Test Shop</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0; background: #f6f6f8 }
+  main { padding: 24px; max-width: 520px; margin: 0 auto; background: #fff }
+  label, input, button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; a made-up hosted payment page. Nothing is charged.</div>
+<main id="main">
+<p>Pay Lumen Test Shop</p>
+<h1>7,99 &euro;</h1>
+<p>Test item, 1 piece</p>
+<form id="pay">
+<label>Email<input name="email" autocomplete="email"></label>
+<label>Name on card<input name="ccname" autocomplete="cc-name"></label>
+<label>Card number<input name="cardnumber" autocomplete="cc-number" inputmode="numeric"></label>
+<label>Expiry (MM/YY)<input name="exp" autocomplete="cc-exp"></label>
+<label>CVC<input name="cvc" autocomplete="cc-csc"></label>
+<button type="submit">Pay 7,99 &euro;</button>
+<p role="status" id="note"></p>
+</form>
+</main>
+<script>
+// The provider-like hosted page of the hosted-checkout flow (ALT-6470):
+// the shop's page links here, on another host. Nothing is sent anywhere.
+document.getElementById("pay").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const digits = (document.querySelector('input[name="cardnumber"]').value || "").replace(/\D/g, "");
+  if (digits.length < 12) {
+    document.getElementById("note").textContent = "Enter a card number.";
+    return;
+  }
+  const main = document.getElementById("main");
+  main.innerHTML = "<h1>Payment received</h1><p></p>";
+  main.querySelector("p").textContent = "Test payment of 7,99 \u20ac to Lumen Test Shop, card ending "
+    + digits.slice(-4) + ". Nothing was charged.";
+});
+</script>
+</body>
+</html>
