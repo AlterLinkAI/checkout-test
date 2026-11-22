@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumen Test Shop - cart</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  a.btn { display: inline-block; padding: 10px 16px; background: #222; color: #fff; text-decoration: none; border-radius: 4px }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up shop and data only. Nothing is sold and nothing is charged.</div>
+<main>
+<h1>Lumen Test Shop</h1>
+<p>Your cart: Test item, 1 piece</p>
+<p>Total: <b>7,99 &euro;</b></p>
+<p>Payment is taken on our payment provider's secure page.</p>
+<p><a class="btn" id="checkout" href="#">Checkout</a></p>
+</main>
+<script>
+// The hosted-checkout flow (ALT-6470): the shop's cart on this host, the
+// payment page on another host (a provider-like page served from the same
+// repo by a different host). ?hosted=<url> overrides it.
+const q = new URLSearchParams(location.search);
+document.getElementById("checkout").href = q.get("hosted")
+  || "https://raw.githack.com/AlterLinkAI/checkout-test/main/hosted/hosted.html";
+</script>
+</body>
+</html>
