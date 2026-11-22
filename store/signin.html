@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Test Store - sign in</title>
+<script src="shop.js"></script>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store, any made-up password works, nothing is sent anywhere.</div>
+<nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
+<main style="padding:24px;max-width:420px">
+<h1>Sign in</h1>
+<form id="f">
+<label>Email <input name="email" type="email" autocomplete="username" required></label><br>
+<label>Password <input name="password" type="password" autocomplete="current-password" required></label><br>
+<button type="submit">Sign in</button>
+</form>
+</main>
+<script>
+header();
+document.getElementById("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  localStorage.setItem("testshop.signedIn", "1");
+  localStorage.setItem("testshop.signIns", String(1 + Number(localStorage.getItem("testshop.signIns") || 0)));
+  location.href = "orders.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Test Store - my orders</title>
+<script src="shop.js"></script>
+</head>
+<body style="font:16px/1.5 system-ui,sans-serif;margin:0">
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
+<nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
+<main id="main" style="padding:24px"></main>
+<script>
+header();
+const main = document.getElementById("main");
+if (!signedIn()) {
+  main.innerHTML = '<h1>Please sign in</h1><p>Sign in to see your orders.</p><a href="signin.html">Sign in</a>';
+} else {
+  main.innerHTML = "<h1>My orders (" + ORDERS.length + ")</h1>" +
+    "<table><tr><th>Order</th><th>Date</th><th>Status</th></tr>" +
+    ORDERS.map(o => '<tr><td><a href="order.html?n=' + o.n + '">' + o.n + "</a></td><td>" + o.date + "</td><td>" + o.status + "</td></tr>").join("") +
+    "</table>";
+}
+</script>
+</body>
+</html>
