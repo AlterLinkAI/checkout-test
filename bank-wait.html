@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approve payment - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank and data only. Nothing is sold and nothing is charged.</div>
+<main id="main"></main>
+<script>
+/*
+  ALT-5436 (AlterLink): the bank step after Pay on bank.html. The state
+  comes from the address only (the press time `at`, `approve` seconds or
+  `never`), so a reload or a new visit shows the same step.
+*/
+const q = new URLSearchParams(location.hash.slice(1));
+const APPROVE = q.get("approve") || "90";
+const AT = Number(q.get("at") || 0);
+const CARD = (q.get("card") || "").replace(/\D/g, "").slice(-4);
+const main = document.getElementById("main");
+
+function approved() {
+  return APPROVE !== "never" && AT > 0 && Date.now() >= AT + Number(APPROVE) * 1000;
+}
+
+function show() {
+  if (!AT) {
+    main.innerHTML = "<h1>Alder Test Bank</h1><p>No payment waits here.</p>";
+    return true;
+  }
+  if (approved()) {
+    const order = "LT-" + String(AT).slice(-6);
+    main.innerHTML = "<h1>Payment received</h1><p></p><p></p>";
+    const [a, b] = main.querySelectorAll("p");
+    a.textContent = "Test payment of 7,99 \u20ac to Lumen Test Shop, card ending " + CARD + ". Nothing was charged.";
+    b.textContent = "Order number: " + order;
+    return true;
+  }
+  main.innerHTML = "<h1>Alder Test Bank</h1>"
+    + "<h2>Approve this payment in the Alder Test Bank app</h2>"
+    + "<p>7,99 \u20ac to Lumen Test Shop.</p>"
+    + "<p>We sent a request to your phone. Open the Alder Test Bank app and approve it there. "
+    + "This page moves on by itself once you have approved.</p>"
+    + "<p role=\"status\">Waiting for your approval...</p>";
+  return false;
+}
+
+if (!show()) {
+  const tick = setInterval(() => { if (approved()) { show(); clearInterval(tick); } }, 3000);
+}
+</script>
+</body>
+</html>
