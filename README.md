@@ -10,3 +10,5 @@ TEST ONLY (AlterLink ALT-6067, ALT-6295, ALT-5436): a look-alike checkout for li
 `timer.html#case=total|shop&ms=4000`: the total or the shop changes a few seconds after the last card input, between the read and the press (the pay gate itself must refuse).
 
 `bank.html#approve=90|never`: after Pay the bank asks the owner to approve the payment in his bank app (`bank-wait.html`). It approves by itself 90 s (or N s) after Pay and then shows "Payment received" with an order number, or never approves. The state lives in the address, so a reload shows the same step.
+
+This repo has no CI. Its PRs merge through the AlterLink workspace tool like every other repo: `python3 dev/merge_chain/merge_chain.py AlterLinkAI/checkout-test <PR> --card ALT-<n>` (ALT-6608), never by hand.
