@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Wedged tab - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+<script>
+// ?mode=loop-now: the page never renders; the script below never returns.
+if (new URLSearchParams(location.search).get("mode") === "loop-now") { for (;;) {} }
+</script>
+</head>
+<body data-page="wedge">
+<h1>Wedged tab (TEST ONLY)</h1>
+<p>Modes: <code>?mode=loop</code> (default; renders, then the page's script spins forever after <code>after</code> ms, default 2000),
+<code>?mode=loop-now</code> (spins before anything renders), <code>?mode=never</code> (renders, but the load event
+never comes: a picture waits on a server that answers after about 150 s, and then another one does).</p>
+<p id="status" role="status">Loading...</p>
+<p><button type="button" id="ping">Ping</button> <span id="pong">Not pinged.</span></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const mode = q.get("mode") || "loop";
+const after = Math.max(0, parseInt(q.get("after") || "2000", 10) || 0);
+pageState.mode = mode;
+pageState.pings = 0;
+document.getElementById("ping").addEventListener("click", () => {
+  pageState.pings += 1;
+  document.getElementById("pong").textContent = "Pinged " + pageState.pings + " time(s), last " + now();
+  record("ping");
+  show();
+});
+if (mode === "never") {
+  // A sub-resource that holds the load event: public delay servers (no data),
+  // the same ones the lease page uses. Each answer starts the next wait.
+  pageState.loaded = false;
+  record("waiting for load");
+  show("Rendered; the load event has not come (the page keeps loading).");
+  const hold = () => {
+    const img = new Image();
+    img.onload = img.onerror = () => { record("hold answered"); show(); hold(); };
+    img.src = "https://httpbin.dev/delay/150?t=" + Date.now();
+    document.body.appendChild(img).style.display = "none";
+  };
+  hold();
+  window.addEventListener("load", () => { pageState.loaded = true; record("load"); show("Loaded (a hold answered)."); });
+} else {
+  pageState.wedge_at = new Date(Date.now() + after).toISOString().replace(/\.\d+Z$/, "Z");
+  record("rendered");
+  show("Rendered. This tab stops answering at " + pageState.wedge_at + " (" + after + " ms).");
+  setTimeout(() => {
+    pageState.wedged = true;
+    record("wedged");
+    show("Wedged since " + now() + ": the page's script never returns from here.");
+    // Let the text above paint, then spin.
+    requestAnimationFrame(() => setTimeout(() => { for (;;) {} }, 50));
+  }, after);
+}
+</script>
+</body>
+</html>

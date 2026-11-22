@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Downloads - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+li{margin:8px 0}</style>
+</head>
+<body data-page="download">
+<h1>Downloads (TEST ONLY)</h1>
+<p>Every file is made up and carries its own reference (<code>BT-TEST-...</code>) in its text, so a saved file can be
+matched to the button that gave it.</p>
+<p id="status" role="status">Nothing downloaded yet.</p>
+<ul>
+  <li><a id="d-csv" href="files/orders.csv" download="orders.csv">Download the order list (CSV)</a> - a plain file link</li>
+  <li><a id="d-pdf" href="files/invoice.pdf" download="invoice.pdf">Download the invoice (PDF)</a> - a plain file link</li>
+  <li><a id="d-newtab" href="files/invoice.pdf" target="_blank" rel="noopener">Open the invoice in a new tab</a> - the browser's PDF viewer, no download event</li>
+  <li><button type="button" id="d-blob">Export my notes (TXT)</button> - the file is made in the page</li>
+  <li><button type="button" id="d-delay">Prepare the statement (CSV)</button> - starts after 3 s ("Preparing...")</li>
+  <li><button type="button" id="d-confirm">Download the archive (ZIP)</button> - asks to confirm first</li>
+</ul>
+<p id="confirm" hidden>Download the archive (2 files)? <button type="button" id="d-yes">Yes, download</button> <button type="button" id="d-no">Cancel</button></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+pageState.started = [];
+function started(id, file) {
+  pageState.started.push({ id: id, file: file, at: now() });
+  record("download started", { id: id, file: file });
+  show("Download started: " + file + " (" + id + ") at " + now());
+}
+function save(name, type, text, id) {
+  const url = URL.createObjectURL(new Blob([text], { type: type }));
+  const a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  started(id, name);
+}
+document.getElementById("d-csv").addEventListener("click", () => started("d-csv", "orders.csv"));
+document.getElementById("d-pdf").addEventListener("click", () => started("d-pdf", "invoice.pdf"));
+document.getElementById("d-newtab").addEventListener("click", () => {
+  record("opened in a new tab", { id: "d-newtab", file: "invoice.pdf" });
+  show("Opened invoice.pdf in a new tab at " + now() + " (no download event).");
+});
+document.getElementById("d-blob").addEventListener("click", () =>
+  save("notes.txt", "text/plain", "BT-TEST-NOTES\nMade-up notes exported by the browser test page.\n", "d-blob"));
+document.getElementById("d-delay").addEventListener("click", () => {
+  record("preparing", { id: "d-delay" });
+  show("Preparing the statement...");
+  setTimeout(() => save("statement.csv", "text/csv",
+    "reference,date,amount\nBT-TEST-STATEMENT,2026-11-01,12.50\nBT-TEST-STATEMENT,2026-11-15,8.00\n", "d-delay"), 3000);
+});
+document.getElementById("d-confirm").addEventListener("click", () => {
+  document.getElementById("confirm").hidden = false;
+  record("asked to confirm", { id: "d-confirm" });
+  show("Waiting for the confirm step.");
+});
+document.getElementById("d-no").addEventListener("click", () => {
+  document.getElementById("confirm").hidden = true;
+  record("cancelled", { id: "d-confirm" });
+  show("Archive download cancelled.");
+});
+document.getElementById("d-yes").addEventListener("click", () => {
+  document.getElementById("confirm").hidden = true;
+  const a = document.createElement("a");
+  a.href = "files/archive.zip"; a.download = "archive.zip"; document.body.appendChild(a); a.click(); a.remove();
+  started("d-confirm", "archive.zip");
+});
+show();
+</script>
+</body>
+</html>

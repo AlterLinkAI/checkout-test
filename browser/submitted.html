@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Message sent - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+dt{font-weight:600}</style>
+</head>
+<body data-page="submitted">
+<h1>Message sent (TEST ONLY)</h1>
+<p id="status" role="status"></p>
+<dl id="got"></dl>
+<p><a href="form.html">Back to the form</a></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const got = Object.fromEntries(new URLSearchParams(location.search));
+const ref = "BT-FORM-" + (Math.abs([...JSON.stringify(got)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % 1000000).toString().padStart(6, "0");
+pageState.received = got;
+pageState.reference = ref;
+const dl = document.getElementById("got");
+for (const [k, v] of Object.entries(got)) {
+  const dt = document.createElement("dt"); dt.textContent = k;
+  const dd = document.createElement("dd"); dd.textContent = v;
+  dl.append(dt, dd);
+}
+record("received", { fields: Object.keys(got).length });
+show("Sent at " + now() + ". Reference " + ref + ".");
+</script>
+</body>
+</html>

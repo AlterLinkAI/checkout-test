@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Arrived - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body data-page="arrived">
+<h1>Arrival page (TEST ONLY)</h1>
+<p id="status" role="status"></p>
+<p><a href="links.html">Back to the links</a></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+pageState.via = new URLSearchParams(location.search).get("via") || "typed or unknown";
+pageState.referrer = document.referrer || null;
+pageState.new_tab = window.history.length === 1;
+pageState.clicks = JSON.parse(sessionStorage.getItem("links.clicks") || "[]");
+record("arrived", { via: pageState.via });
+show("Arrived via " + pageState.via + " at " + now() + (pageState.new_tab ? " (in a new tab)" : ""));
+</script>
+</body>
+</html>
