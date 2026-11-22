@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Frame and shadow inputs - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:760px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+section{border:1px solid #ddd;padding:10px 14px;margin:14px 0}iframe{width:100%;height:130px;border:1px dashed #999}</style>
+</head>
+<body data-page="frames">
+<h1>Frame and shadow inputs (TEST ONLY)</h1>
+<p>Three fields that hold a voucher code. Each one sits somewhere a plain page read does not reach: inside a frame,
+inside an open shadow root, and inside a closed shadow root. Press each "Apply" after typing.</p>
+<p id="status" role="status">Nothing applied yet.</p>
+<section><h2>1. In a frame</h2><iframe id="frame" src="frame-inner.html" title="Voucher frame"></iframe></section>
+<section><h2>2. In an open shadow root</h2><voucher-box id="open-box" data-mode="open" data-where="shadow-open"></voucher-box></section>
+<section><h2>3. In a closed shadow root</h2><voucher-box id="closed-box" data-mode="closed" data-where="shadow-closed"></voucher-box></section>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+pageState.applied = { frame: null, "shadow-open": null, "shadow-closed": null };
+function applied(where, code) {
+  pageState.applied[where] = { code: code, at: now() };
+  record("applied", { where: where, code: code });
+  const done = Object.values(pageState.applied).filter(Boolean).length;
+  show("Applied " + where + ": " + code + " (" + done + " of 3 applied)");
+}
+// The frame is the same origin and reports by message.
+window.addEventListener("message", (e) => {
+  if (e.origin === location.origin && e.data && e.data.type === "voucher") applied("frame", e.data.code);
+});
+customElements.define("voucher-box", class extends HTMLElement {
+  connectedCallback() {
+    const root = this.attachShadow({ mode: this.dataset.mode });
+    root.innerHTML = '<label>Voucher code <input name="code" autocomplete="off"></label> ' +
+      '<button type="button">Apply</button> <span class="msg"></span>';
+    const where = this.dataset.where;
+    root.querySelector("button").addEventListener("click", () => {
+      const code = root.querySelector("input").value.trim();
+      root.querySelector(".msg").textContent = code ? "Applied " + code : "Type a code first";
+      if (code) applied(where, code);
+    });
+  }
+});
+show();
+</script>
+</body>
+</html>

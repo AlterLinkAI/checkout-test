@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><title>Voucher frame</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:8px}</style></head>
+<body>
+<label>Voucher code <input id="code" name="code" autocomplete="off"></label>
+<button type="button" id="apply">Apply</button> <span id="msg"></span>
+<script>
+// TEST ONLY (ALT-6914): reports the applied code to the page around it.
+document.getElementById("apply").addEventListener("click", () => {
+  const code = document.getElementById("code").value.trim();
+  document.getElementById("msg").textContent = code ? "Applied " + code : "Type a code first";
+  if (code) parent.postMessage({ type: "voucher", code: code }, location.origin);
+});
+</script>
+</body>
+</html>

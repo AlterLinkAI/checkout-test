@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Lumen Test Bank app - browser test</title>
+<style>body{font:18px/1.5 system-ui,sans-serif;margin:24px;max-width:420px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body data-page="bank-app">
+<h1>Lumen Test Bank app (TEST ONLY)</h1>
+<p>Stands in for the bank app on the owner's phone. Only the owner opens this, in a takeover of the browser.</p>
+<p id="status" role="status"></p>
+<button type="button" id="approve">Approve payment</button>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+pageState.request = localStorage.getItem("bank.request");
+show(pageState.request ? "Payment request " + pageState.request + " is waiting." : "No payment request is waiting.");
+document.getElementById("approve").addEventListener("click", () => {
+  if (!pageState.request) return;
+  localStorage.setItem("bank.approval", pageState.request);
+  record("approved", { request: pageState.request });
+  show("Approved " + pageState.request + " at " + now() + ". Go back to the shop tab.");
+});
+</script>
+</body>
+</html>

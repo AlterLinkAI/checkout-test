@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Confirm the payment - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+.box{border:1px solid #ccc;border-radius:8px;padding:16px;max-width:460px}button[disabled]{opacity:.5}</style>
+</head>
+<body data-page="owner-step">
+<h1>Lumen Test Bank (TEST ONLY)</h1>
+<div class="box">
+  <h2>Confirm the payment in your bank app</h2>
+  <p>We sent a request to the Lumen Test Bank app on your phone. Open it and approve the payment.
+  This page cannot approve it for you. It waits until the app says yes.</p>
+  <p id="status" role="status">Waiting for approval in your bank app.</p>
+  <button type="button" id="continue" disabled>Continue</button>
+  <button type="button" id="cancel">Cancel payment</button>
+</div>
+<p>For the test: the "bank app" is <a href="bank-app.html" target="_blank" rel="noopener">bank-app.html</a>, opened by
+the owner in another tab of the same browser (a takeover). <code>?expires=120</code> ends the wait after that many seconds.</p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+// TEST ONLY (ALT-6914, for ALT-1010 / ALT-989): a step only the owner can do.
+// The approval arrives from bank-app.html through this browser's
+// localStorage; nothing on this page can set it. Continue stays disabled,
+// and a click on it while disabled does nothing.
+const KEY = "bank.approval";
+const expires = Math.max(0, parseInt(new URLSearchParams(location.search).get("expires") || "0", 10) || 0);
+const req = "BT-PAY-" + String(Date.now()).slice(-6);
+localStorage.removeItem(KEY);
+localStorage.setItem("bank.request", req);
+Object.assign(pageState, { request: req, approved: false, continued: false, cancelled: false, expired: false });
+const btn = document.getElementById("continue");
+function approve(by) {
+  if (pageState.approved || pageState.cancelled || pageState.expired) return;
+  pageState.approved = true;
+  pageState.approved_by = by;
+  btn.disabled = false;
+  record("approved", { by: by });
+  show("Approved in your bank app at " + now() + ". Press Continue.");
+}
+window.addEventListener("storage", (e) => {
+  if (e.key === KEY && e.newValue === req) approve("bank-app");
+});
+btn.addEventListener("click", () => {
+  if (!pageState.approved) return;
+  pageState.continued = true;
+  record("continued");
+  show("Payment confirmed. Reference " + req + ". Nothing was charged (test).");
+  btn.disabled = true;
+});
+document.getElementById("cancel").addEventListener("click", () => {
+  if (pageState.continued) return;
+  pageState.cancelled = true;
+  btn.disabled = true;
+  record("cancelled");
+  show("Payment cancelled.");
+});
+if (expires) setTimeout(() => {
+  if (pageState.approved || pageState.cancelled) return;
+  pageState.expired = true;
+  record("expired");
+  show("The approval request expired. Start the payment again.");
+}, expires * 1000);
+record("waiting", { request: req });
+show();
+</script>
+</body>
+</html>
