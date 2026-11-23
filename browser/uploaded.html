@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>File Uploaded - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="uploaded">
+<h1>File Uploaded! (TEST ONLY)</h1>
+<p id="status" role="status"></p>
+<p>File name: <span id="uploaded-files"></span></p>
+<p><a href="upload.html">Back to the upload form</a></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+document.getElementById("uploaded-files").textContent = q.get("name") || "";
+pageState.received = { name: q.get("name"), size: q.get("size") };
+record("received", pageState.received);
+show("File Uploaded at " + now() + ": " + q.get("name") + " (" + q.get("size") + " bytes).");
+</script>
+</body>
+</html>
