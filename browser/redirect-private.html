@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- ALT-6207 / ALT-7638 test fixture, test cells only: the page sends the browser on at once to an in-cluster name
+(signin.alterlink-testfakes.svc), which a test cell's page rule admits and the address guard must refuse
+because it resolves to a private (cluster) address. No credentials, no tracking. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TEST SITE - redirect check: private address</title>
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0;url=http://signin.alterlink-testfakes.svc/">
+<script>location.replace('http://signin.alterlink-testfakes.svc/');</script>
+</head>
+<body>
+<h1>TEST SITE - redirect check: private address</h1>
+<p>This page forwards at once to <code>http://signin.alterlink-testfakes.svc/</code>, a private in-cluster address. A guarded browser refuses it.</p>
+</body>
+</html>
