@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ride booking map test</title>
+<style>
+  body { font: 16px sans-serif; margin: 0; }
+  header { padding: 8px 12px; }
+  #map { display: block; width: 100vw; height: 70vh; }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST ONLY: a made-up map, no ride is booked and nothing is sent anywhere.</div>
+<header>
+  <h1>Lantern Rides (test)</h1>
+  <p id="status" role="status">Loading the map&hellip;</p>
+</header>
+<canvas id="map" aria-label="Map of pickup points (test)"></canvas>
+<script>
+// TEST ONLY (ALT-5569): the page type the owner's crash came from, a
+// signed-in ride app (m.uber.com): a WebGL map that keeps many tile
+// textures in GPU memory (SwiftShader in the sandbox, so it is the GPU
+// process's own RAM), pans for a while, plus the app's own JS heap.
+// Address: #tiles=<n>&px=<side>&hold=<MiB>&pan=<seconds>, defaults 400,
+// 256, 300, 5. Everything is drawn in this browser; nothing is loaded from
+// any server and nothing is sent.
+const args = new URLSearchParams(location.hash.slice(1));
+const TILES = Math.min(parseInt(args.get("tiles") || "400", 10), 4000);
+const PX = Math.min(parseInt(args.get("px") || "256", 10), 1024);
+const HOLD = Math.min(parseInt(args.get("hold") || "300", 10), 3000);
+const PAN = Math.min(parseFloat(args.get("pan") || "5"), 60);
+const status = document.getElementById("status");
+
+// the app's own heap (state, caches), every page written so it is resident
+const held = [];
+for (let m = 0; m < HOLD; m += 16) {
+  const a = new Uint8Array(16 * 1024 * 1024);
+  for (let k = 0; k < a.length; k += 4096) a[k] = (k >> 12) & 255;
+  held.push(a);
+}
+
+const canvas = document.getElementById("map");
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+const gl = canvas.getContext("webgl");
+if (!gl) {
+  status.textContent = "Map failed: no WebGL.";
+  throw new Error("no webgl");
+}
+const vs = `attribute vec2 p; uniform vec2 o; uniform float s; varying vec2 uv;
+  void main(){ uv = p; gl_Position = vec4((p * s + o) * 2.0 - 1.0, 0, 1); }`;
+const fs = `precision mediump float; varying vec2 uv; uniform sampler2D t;
+  void main(){ gl_FragColor = texture2D(t, uv); }`;
+function shader(type, src) {
+  const sh = gl.createShader(type);
+  gl.shaderSource(sh, src);
+  gl.compileShader(sh);
+  return sh;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,0, 1,0, 0,1, 1,1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, "p");
+gl.enableVertexAttribArray(loc);
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const uO = gl.getUniformLocation(prog, "o");
+const uS = gl.getUniformLocation(prog, "s");
+
+// tiles: noise so nothing compresses, one texture each, all kept
+const textures = [];
+const pixels = new Uint8Array(PX * PX * 4);
+let seed = 2654435761 >>> 0;
+for (let i = 0; i < TILES; i++) {
+  for (let k = 0; k < pixels.length; k += 4) {
+    seed ^= seed << 13; seed >>>= 0; seed ^= seed >>> 17; seed ^= seed << 5; seed >>>= 0;
+    pixels[k] = 60 + (seed & 63); pixels[k + 1] = 120 + ((seed >> 8) & 63);
+    pixels[k + 2] = 60 + ((seed >> 16) & 63); pixels[k + 3] = 255;
+  }
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, PX, PX, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  textures.push(t);
+}
+
+const side = Math.ceil(Math.sqrt(TILES));
+function draw(shift) {
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0.9, 0.9, 0.85, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  const s = 1 / 8;
+  for (let i = 0; i < TILES; i++) {
+    const x = (i % side) * s - shift, y = Math.floor(i / side) * s - shift;
+    if (x > 1 || y > 1 || x < -s || y < -s) continue;
+    gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+    gl.uniform2f(uO, x, y);
+    gl.uniform1f(uS, s);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+}
+
+status.textContent = `Panning the map: ${TILES} tiles.`;
+const t0 = performance.now();
+const span = Math.max(side / 8 - 1, 0);
+function frame(now) {
+  const f = Math.min((now - t0) / (PAN * 1000), 1);
+  draw(f * span);
+  if (f < 1) requestAnimationFrame(frame);
+  else status.textContent = `Map ready: ${TILES} tiles, 3 pickup points near Lantern Square (${held.length * 16} MiB held).`;
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
