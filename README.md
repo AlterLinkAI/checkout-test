@@ -73,4 +73,4 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - `alerts.html`: a page of three script-dialog buttons with an explanatory paragraph (a page whose article extractor finds only button labels).
 - `login.html` -> `secure-area.html`: a made-up sign-in page (any password).
 - `guard.html`: links, a download, a form post, a frame, an image and a fetch aimed at private/loopback literal addresses, for the browser address guard.
-- `loop-frames.html` (ALT-1731): a page that nests itself in frames (four levels) and, with the default `?hosts=12000`, holds more open shadow roots than one in-page script may walk (10000), so a snapshot hits the script budget. `?hosts=0` keeps only the nested frames.
+- `loop-frames.html` (ALT-1731): a page that nests itself in frames (four levels) and, with the default `?hosts=11000`, holds more open shadow roots than one in-page script may walk (10000), so a snapshot hits the script budget. `?hosts=0` keeps only the nested frames.

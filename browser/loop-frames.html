@@ -10,7 +10,7 @@
 <h1>Looping frames (TEST ONLY, ALT-1731)</h1>
 <p>A page built to be too tangled for the twin's in-page scripts. It nests itself in frames
 (<code>?depth=</code>, default 0, stops at 4) and, on the top page only, adds
-<code>?hosts=</code> elements (default 12000) that each hold an open shadow root, more than the
+<code>?hosts=</code> elements (default 11000) that each hold an open shadow root, more than the
 10000 roots one in-page script may walk. Use <code>?hosts=0</code> for the plain nested frames.</p>
 <p id="status" role="status">Loading.</p>
 <pre id="state-json" aria-label="Page state JSON"></pre>
@@ -21,14 +21,17 @@
 // TEST ONLY: nothing is sent anywhere; the page only builds its own tree.
 const q = new URLSearchParams(location.search);
 const depth = Math.min(parseInt(q.get("depth") || "0", 10) || 0, 4);
-const hosts = depth === 0 ? Math.min(parseInt(q.get("hosts") || "12000", 10) || 0, 50000) : 0;
+const hosts = depth === 0 ? Math.min(parseInt(q.get("hosts") || "11000", 10) || 0, 50000) : 0;
 pageState.depth = depth;
 pageState.hosts = hosts;
 const box = document.getElementById("hosts");
-for (let i = 0; i < hosts; i++) {
-  const h = document.createElement("i");
-  h.attachShadow({ mode: "open" }).innerHTML = "<span>x</span>";
-  box.appendChild(h);
+// Light hosts (an empty open shadow root each), built in chunks so the page stays responsive.
+let built = 0;
+function build() {
+  const end = Math.min(built + 1000, hosts);
+  for (; built < end; built++) box.appendChild(document.createElement("i")).attachShadow({ mode: "open" });
+  show(built < hosts ? "Building " + built + " of " + hosts + " shadow hosts." : "Level " + depth + " built, " + hosts + " shadow hosts.");
+  if (built < hosts) setTimeout(build, 0);
 }
 if (depth < 4) {
   const f = document.createElement("iframe");
@@ -36,7 +39,7 @@ if (depth < 4) {
   f.src = "loop-frames.html?depth=" + (depth + 1);
   document.body.appendChild(f);
 }
-show("Level " + depth + " built, " + hosts + " shadow hosts.");
+build();
 </script>
 </body>
 </html>
