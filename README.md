@@ -56,3 +56,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Language articles (ALT-4536)
 
 `articles/en-1..3.html` and `articles/es-1..3.html`: short made-up articles in English and in Spanish (our own text), so live checks of the reply language never open a real site.
+
+## Peak heights (ALT-3976)
+
+`heights/` is a page of three made-up peaks and heights (Alder, Birch, Cedar) for live voice checks that ask the twin to read a page in the background. It contacts nothing.
