@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payment status - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank and data only. Nothing is sold and nothing is charged.</div>
+<main id="main">
+<h1>Alder Test Bank</h1>
+<p id="status">Processing...</p>
+<button type="button" id="refresh">Refresh status</button>
+</main>
+<script>
+/*
+  ALT-7296 (AlterLink): a status line that shows short-lived texts and then
+  settles on a result; the button never changes. For live checks of a task's
+  page wait ("processing, then result").
+    loading/#after=40&id=run1   "Processing..." from load; at 40 s "Checking...";
+                                at 50 s "Contacting the bank..."; at 60 s
+                                "Payment received. Reference: PX-7296." and it
+                                stays.
+  The first load starts the clock (localStorage, key `id`). Nothing is sent
+  anywhere.
+*/
+const q = new URLSearchParams(location.hash.slice(1));
+const AFTER = Number(q.get("after") || 40);
+const KEY = "loading-t0-" + (q.get("id") || "default");
+if (!localStorage.getItem(KEY)) localStorage.setItem(KEY, String(Date.now()));
+const T0 = Number(localStorage.getItem(KEY));
+const el = document.getElementById("status");
+function tick() {
+  const s = (Date.now() - T0) / 1000 - AFTER;
+  el.textContent = s < 0 ? "Processing..."
+    : s < 10 ? "Checking..."
+    : s < 20 ? "Contacting the bank..."
+    : "Payment received. Reference: PX-7296.";
+}
+tick();
+setInterval(tick, 500);
+</script>
+</body>
+</html>
