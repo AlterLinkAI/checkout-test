@@ -52,8 +52,14 @@ pre{background:#f7f6f3;padding:12px;font-size:12px;white-space:pre-wrap;word-bre
 // for live checks of browser_act edits. Nothing leaves this browser: state
 // lives in localStorage. ?session=expired makes every save fail with a
 // "session expired" banner; ?reset=1 starts from the seed page.
+// ALT-7079: the expired session sticks in this browser, as a real one does:
+// opening the page again without ?session=expired is still expired, until
+// ?reset=1 (which signs this browser back in).
 const params = new URLSearchParams(location.search);
-const EXPIRED = params.get("session") === "expired";
+const STICKY = "notes.session";
+if (params.get("reset") === "1") localStorage.removeItem(STICKY);
+if (params.get("session") === "expired") localStorage.setItem(STICKY, "expired");
+const EXPIRED = localStorage.getItem(STICKY) === "expired";
 const KEY = "notes.launch-plan." + (EXPIRED ? "expired" : "ok");
 const SAVE_MS = 700;  // a short debounce, as the real editor saves
 const SEED = {
