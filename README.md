@@ -44,3 +44,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - `download.html`: CSV and PDF file links, the PDF in a new tab (viewer, no download event), a file made in the page, a delayed one (3 s), and one behind a confirm step. Every file carries a `BT-TEST-...` reference in its text.
 - `frames.html`: three voucher fields that a plain page read does not reach: in a same-origin frame (`frame-inner.html`), in an open shadow root and in a closed shadow root. Each "Apply" is recorded in `applied`; the status counts "N of 3 applied".
 - `owner-step.html` + `bank-app.html`: "Confirm the payment in your bank app". Continue stays disabled (a forced or script click does nothing) until the owner opens `bank-app.html` in another tab of the same browser and presses "Approve payment". `?expires=<s>` ends the wait; Cancel ends it too. Nothing is charged.
+
+## Heavy gallery (ALT-5569)
+
+`heavy/index.html#n=48&px=2048`: a made-up photo archive that draws `n` noise images of `px`×`px` in this browser and keeps them all decoded at once (about 16 MiB each at 2048), to fill the renderer's discardable image memory and reproduce the sandbox's out-of-memory renderer crash. It loads nothing from any server and sends nothing.
