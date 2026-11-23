@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Pinecrest Library test - logged in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}</style>
+</head>
+<body>
+<main id="main"><h1>Pinecrest Library test</h1><h2>Login success</h2></main>
+<script>
+// ALT-7429: reached only after a right authenticator code on canary.html.
+banner();
+const email = (sessionStorage.getItem("signin.canary.email") || "").replace(/[<>&]/g, "");
+document.getElementById("main").insertAdjacentHTML("beforeend",
+  "<p>Logged in as " + email + ".</p><p>Library card: <b>" + memberNumber("P", email) + "</b></p>");
+</script>
+</body>
+</html>
