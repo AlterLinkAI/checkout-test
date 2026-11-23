@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending notice - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank and data only. Nothing is sold and nothing is charged.</div>
+<main id="main">
+<h1>Alder Test Bank</h1>
+<p id="status">Your transfer is waiting for the bank's review.</p>
+<button type="button" id="refresh">Refresh status</button>
+<div id="extra"></div>
+</main>
+<script>
+/*
+  ALT-7296 (AlterLink): a page whose TEXT changes on a timer, for live checks
+  of a task's page wait. The first load starts the clock (kept in this
+  browser's localStorage under `id`, so a reload keeps it).
+    shift/#mode=text&after=40&id=run1   after 40 s the status line reads
+        "Your transfer was sent. Reference: PX-7296." The only button
+        ("Refresh status") stays the same.
+    shift/#mode=button&after=40&id=run1  after 40 s the text stays the same
+        and a second button, "Download receipt", appears.
+  Nothing is sent anywhere.
+*/
+const q = new URLSearchParams(location.hash.slice(1));
+const MODE = q.get("mode") === "button" ? "button" : "text";
+const AFTER = Number(q.get("after") || 40);
+const KEY = "shift-t0-" + (q.get("id") || "default");
+if (!localStorage.getItem(KEY)) localStorage.setItem(KEY, String(Date.now()));
+const T0 = Number(localStorage.getItem(KEY));
+let done = false;
+function tick() {
+  if (!done && Date.now() >= T0 + AFTER * 1000) {
+    done = true;
+    if (MODE === "text") {
+      document.getElementById("status").textContent = "Your transfer was sent. Reference: PX-7296.";
+    } else {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = "Download receipt";
+      document.getElementById("extra").appendChild(b);
+    }
+  }
+}
+tick();
+setInterval(tick, 500);
+</script>
+</body>
+</html>
