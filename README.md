@@ -109,3 +109,5 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Blocked one-shot page (ALT-6859)
 
 `outage/title-6859.html` (title "Fernhill Test Notice Board") answers 200 when opened plainly. `outage/title-6859.html?img=https://alterlinkai.github.io/checkout-test/outage/shape-6859.png` hands it a picture's address as a parameter, a shape the twin's address guard refuses (ALT-6744), so "open it and tell me the title" is a blocked turn on our own page. `shape-6859.png` is a made-up 8x8 light-blue square.
+
+`lease/tf.html#slow=<url>&never=<url>` (ALT-5057): the same offer shape, its two new-tab documents taken from the fragment, so a check can point them at the test fakes host without the fakes' secret path ever being in this repo or sent to GitHub.
