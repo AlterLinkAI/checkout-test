@@ -52,3 +52,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 `heavy/index.html#n=48&px=2048&hold=0`: a made-up photo archive that draws `n` noise images of `px`×`px` in this browser and keeps them all decoded at once (about 16 MiB each at 2048), to fill the renderer's discardable image memory and reproduce the sandbox's out-of-memory renderer crash. `hold=<MiB>` also keeps that much live page memory for the page's whole life, so the decodes land near the sandbox's memory limit. It loads nothing from any server and sends nothing.
 
 `ride/index.html#tiles=400&px=256&hold=300&pan=5`: a made-up ride-booking map, the page type of the owner's renderer crash (ALT-5569, a signed-in map app). A WebGL map keeps `tiles` noise textures of `px`×`px` in GPU memory (SwiftShader in the sandbox, so the GPU process's own RAM), pans for `pan` seconds and keeps `hold` MiB of live app memory. It loads nothing from any server and sends nothing.
+
+## Language articles (ALT-4536)
+
+`articles/en-1..3.html` and `articles/es-1..3.html`: short made-up articles in English and in Spanish (our own text), so live checks of the reply language never open a real site.
