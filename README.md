@@ -96,3 +96,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 `weather/` (ALT-7248): one made-up forecast, `en.html` and `ru.html`, the same for every town (today, tonight, tomorrow, with temperatures, wind and rain chance), for live checks of the twin's weather answers through the test cells' web-search fake, so they never search a real weather site. Static, nothing is sent anywhere.
 
 `places/` (ALT-7248): a made-up place (the area around Hallerberg Central Station, see `city/`), `en.html` and `ru.html`, for "where am I" and place-name checks through the same fake. Static, nothing is sent anywhere.
+
+## Page-change pages (ALT-7296)
+
+`shift/index.html#mode=text|button&after=40&id=<run>`: a made-up bank notice for live checks of a task's page wait. `mode=text` (default): after `after` seconds the status line changes to "Your transfer was sent. Reference: PX-7296." and the one button ("Refresh status") stays the same. `mode=button`: the text stays the same and a second button, "Download receipt", appears. The first load starts the clock (localStorage, key by `id`). Nothing is sent anywhere.
