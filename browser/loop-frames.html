@@ -39,7 +39,7 @@ const box = document.getElementById("hosts");
 let built = 0;
 function build() {
   const end = Math.min(built + 1000, hosts);
-  for (; built < end; built++) box.appendChild(document.createElement("i")).attachShadow({ mode: "open" });
+  for (; built < end; built++) box.appendChild(document.createElement("span")).attachShadow({ mode: "open" });
   show(built < hosts ? "Building " + built + " of " + hosts + " shadow hosts." : "Level " + depth + " built, " + hosts + " shadow hosts.");
   if (built < hosts) setTimeout(build, 0);
 }
