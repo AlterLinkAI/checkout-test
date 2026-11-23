@@ -105,3 +105,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Page-change pages (ALT-7296)
 
 `shift/index.html#mode=text|button&after=40&id=<run>`: a made-up bank notice for live checks of a task's page wait. `mode=text` (default): after `after` seconds the status line changes to "Your transfer was sent. Reference: PX-7296." and the one button ("Refresh status") stays the same. `mode=button`: the text stays the same and a second button, "Download receipt", appears. The first load starts the clock (localStorage, key by `id`). Nothing is sent anywhere.
+
+## Blocked one-shot page (ALT-6859)
+
+`outage/title-6859.html` (title "Fernhill Test Notice Board") answers 200 when opened plainly. `outage/title-6859.html?img=https://alterlinkai.github.io/checkout-test/outage/shape-6859.png` hands it a picture's address as a parameter, a shape the twin's address guard refuses (ALT-6744), so "open it and tell me the title" is a blocked turn on our own page. `shape-6859.png` is a made-up 8x8 light-blue square.
