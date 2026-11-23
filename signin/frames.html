@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Club test - sign in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:520px}
+label,input,button{display:block;margin:10px 0}iframe{width:480px;height:230px;border:1px solid #999}
+section{margin:18px 0}</style>
+</head>
+<body>
+<main>
+<h1>Harbor Club test</h1>
+<p>Test page (ALT-7286): any made-up email and password work here.</p>
+<label>Email <input name="email" type="email" autocomplete="username"></label>
+<!-- 1. A frame of this origin: its fields are in another document. -->
+<section><h2>Member sign-in</h2>
+<iframe id="same" title="Member sign-in" src="frames-inner.html?pane=member"></iframe></section>
+<!-- 2. A sandboxed frame without allow-same-origin: an opaque origin, so it is
+     cross-origin to this page (contentDocument is unreadable from here). -->
+<section><h2>Partner sign-in</h2>
+<iframe id="cross" title="Partner sign-in" sandbox="allow-scripts allow-forms"
+  src="frames-inner.html?pane=partner"></iframe></section>
+<!-- 3. An open shadow root. -->
+<section><h2>Staff sign-in</h2><div id="staff"></div></section>
+</main>
+<script>
+// TEST ONLY: made-up sign-in panes; nothing is sent anywhere.
+banner();
+const root = document.getElementById("staff").attachShadow({ mode: "open" });
+function staff() {
+  root.innerHTML = '<form id="s"><label>Staff password <input name="password" type="password" ' +
+    'autocomplete="current-password"></label><label>Staff code <input name="code" inputmode="numeric" ' +
+    'autocomplete="one-time-code" maxlength="6"></label><button type="submit">Sign in</button></form>';
+  root.getElementById("s").addEventListener("submit", (e) => {
+    e.preventDefault();
+    root.innerHTML = "<p>Staff pane: signed in.</p>";
+  });
+}
+staff();
+</script>
+</body>
+</html>
