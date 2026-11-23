@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  label, input, button { display: block; margin: 10px 0 }
+  #note { color: #8a4b00 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank and data only. Nothing is real.</div>
+<main>
+<h1>Alder Test Bank</h1>
+<p>Sign in with your customer number.</p>
+<form id="f">
+<label>Customer number<input name="customer" id="customer" inputmode="numeric" autocomplete="off"></label>
+<button type="submit" id="go">Continue</button>
+<p role="status" id="note"></p>
+</form>
+</main>
+<script>
+/*
+  TEST ONLY (ALT-999, AlterLink): a sign-in that never gets past its first
+  step. The field takes typing (a read-back shows it held), and every press
+  of Continue only changes the status line -- same address, same controls --
+  with a new reference each time, so the press has no receipt either way.
+  Nothing is sent anywhere; the page never succeeds.
+*/
+let n = 0;
+document.getElementById("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  n += 1;
+  const ref = Math.random().toString(36).slice(2, 8).toUpperCase();
+  document.getElementById("note").textContent =
+    "We could not process your request right now (attempt " + n + ", ref " + ref +
+    "). Please press Continue again.";
+});
+</script>
+</body>
+</html>
