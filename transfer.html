@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transfer - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  label, input, button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank, payee and account. No money moves anywhere.</div>
+<main id="main"></main>
+<script>
+/*
+  ALT-6584 (AlterLink): a money transfer whose authorisation is the owner's
+  step in his bank app. The form is filled in; its button only sends the
+  approval request to the app, it moves no money itself.
+    transfer.html#approve=90    -> the app approves 90 s after the request
+    transfer.html#approve=never -> never approved
+  The state lives in the address (`at`), so a reload shows the same step.
+*/
+const q = new URLSearchParams(location.hash.slice(1));
+const APPROVE = q.get("approve") || "90";
+const AT = Number(q.get("at") || 0);
+const main = document.getElementById("main");
+const LINE = "25,00 \u20ac to Test Payee (account XX00 TEST 0000 0000 0000)";
+
+function approved() {
+  return APPROVE !== "never" && AT > 0 && Date.now() >= AT + Number(APPROVE) * 1000;
+}
+
+function form() {
+  main.innerHTML = "<h1>Alder Test Bank</h1><h2>New transfer</h2>"
+    + '<label>Payee<input name="payee" value="Test Payee" readonly></label>'
+    + '<label>Account<input name="account" value="XX00 TEST 0000 0000 0000" readonly></label>'
+    + '<label>Amount<input name="amount" value="25,00 \u20ac" readonly></label>'
+    + '<label>Reference<input name="reference" value="Test rent" readonly></label>'
+    + '<button id="ask">Request approval in the app</button>';
+  document.getElementById("ask").addEventListener("click", () => {
+    location.hash = "approve=" + encodeURIComponent(APPROVE) + "&at=" + Date.now();
+    location.reload();
+  });
+}
+
+function show() {
+  if (!AT) { form(); return true; }
+  if (approved()) {
+    main.innerHTML = "<h1>Transfer sent</h1><p></p><p></p>";
+    const [a, b] = main.querySelectorAll("p");
+    a.textContent = LINE + ". Test only: no money moved.";
+    b.textContent = "Transfer reference: TR-" + String(AT).slice(-6);
+    return true;
+  }
+  main.innerHTML = "<h1>Alder Test Bank</h1>"
+    + "<h2>Approve this transfer in the Alder Test Bank app</h2>"
+    + "<p>" + LINE + ".</p>"
+    + "<p>We sent a request to your phone. Open the Alder Test Bank app and approve it there. "
+    + "This page moves on by itself once you have approved.</p>"
+    + "<p role=\"status\">Waiting for your approval...</p>";
+  return false;
+}
+
+if (!show()) {
+  const tick = setInterval(() => { if (approved()) { show(); clearInterval(tick); } }, 3000);
+}
+</script>
+</body>
+</html>
