@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test connect page - AlterLink test fake</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:520px}
+.note{color:#555;font-size:13px}code{background:#f2f2f2;padding:0 4px}</style>
+</head>
+<body>
+<main>
+<h1>Test connect page</h1>
+<p>This is the connect link of the AlterLink Composio <strong>test fake</strong> (ALT-7282). No real
+service is connected here and nothing is sent anywhere.</p>
+<p>Toolkit: <code id="toolkit">-</code><br>Link: <code id="link">-</code></p>
+<p class="note">A test run completes this connection on the fake's control port; this page does nothing.</p>
+</main>
+<script>
+// ALT-7282 (for ALT-6755 (b), ALT-3590): the redirect_url the testfakes `composio` fake hands out,
+// <this page>?toolkit=<slug>&link=lk_fake<hex>. It shows both values as text and calls nothing.
+const q = new URLSearchParams(location.search);
+document.getElementById("toolkit").textContent = (q.get("toolkit") || "-").slice(0, 64);
+document.getElementById("link").textContent = (q.get("link") || "-").slice(0, 64);
+</script>
+</body>
+</html>

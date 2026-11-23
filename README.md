@@ -74,3 +74,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - `login.html` -> `secure-area.html`: a made-up sign-in page (any password).
 - `guard.html`: links, a download, a form post, a frame, an image and a fetch aimed at private/loopback literal addresses, for the browser address guard.
 - `loop-frames.html` (ALT-1731): a page with cyclic same-origin frames (it nests itself four levels deep and every frame element answers with the top document, `?cycle=0` off) and, with the default `?hosts=11000`, holds more open shadow roots than one in-page script may walk (10000), so a snapshot hits the script budget. `?hosts=0` keeps only the nested frames.
+
+## Composio fake connect page (ALT-7282)
+
+`connect/index.html?toolkit=<slug>&link=lk_fake<hex>`: the link the testfakes `composio` fake (alterlink-core `testfakes/testfakes/composio.py`) hands out as `redirect_url` when a test cell starts a Composio connection. It shows the toolkit and link id as text and calls nothing; the run completes the connection on the fake's control port.
