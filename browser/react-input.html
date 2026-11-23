@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Lumen Test Bank sign-in - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;width:100%;max-width:320px}</style>
+</head>
+<body data-page="react-input">
+<h1>Lumen Test Bank (TEST ONLY)</h1>
+<p>A made-up sign-in step whose customer-number field behaves like a framework-controlled input (ALT-1001): a value written by a script is put back
+to the field's own state; only real key presses change it. Nothing is sent anywhere.</p>
+<p id="status" role="status">The field is empty.</p>
+<label>Customer number <input id="cust" name="customer" inputmode="numeric" autocomplete="off"></label>
+<button type="button" id="next">Next</button>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+// TEST ONLY: the framework's own state wins over any script-made write.
+var inp = document.getElementById("cust");
+var proto = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+var state = "";
+Object.assign(pageState, { length: 0, typedByKeys: 0, restored: 0 });
+Object.defineProperty(inp, "value", {
+  get: function () { return proto.get.call(inp); },
+  set: function () { proto.set.call(inp, state); pageState.restored++; record("script_write_restored"); show(); }
+});
+inp.addEventListener("input", function (e) {
+  if (!e.isTrusted) { proto.set.call(inp, state); pageState.restored++; record("synthetic_input_restored"); show(); return; }
+  state = proto.get.call(inp);
+  pageState.length = state.length; pageState.typedByKeys++;
+  record("typed", { length: state.length });
+  show(state.length ? "The field holds " + state.length + " characters." : "The field is empty.");
+});
+setInterval(function () {
+  if (proto.get.call(inp) !== state) { proto.set.call(inp, state); pageState.restored++; show(); }
+}, 250);
+document.getElementById("next").addEventListener("click", function () {
+  record("next", { length: state.length });
+  show(state.length ? "Next pressed with " + state.length + " characters." : "Enter your customer number.");
+});
+show();
+</script>
+</body>
+</html>
