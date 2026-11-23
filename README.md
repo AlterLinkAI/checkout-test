@@ -47,4 +47,4 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 
 ## Heavy gallery (ALT-5569)
 
-`heavy/index.html#n=48&px=2048`: a made-up photo archive that draws `n` noise images of `px`×`px` in this browser and keeps them all decoded at once (about 16 MiB each at 2048), to fill the renderer's discardable image memory and reproduce the sandbox's out-of-memory renderer crash. It loads nothing from any server and sends nothing.
+`heavy/index.html#n=48&px=2048&hold=0`: a made-up photo archive that draws `n` noise images of `px`×`px` in this browser and keeps them all decoded at once (about 16 MiB each at 2048), to fill the renderer's discardable image memory and reproduce the sandbox's out-of-memory renderer crash. `hold=<MiB>` also keeps that much live page memory for the page's whole life, so the decodes land near the sandbox's memory limit. It loads nothing from any server and sends nothing.

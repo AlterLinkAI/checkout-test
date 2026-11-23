@@ -24,6 +24,16 @@
 const args = new URLSearchParams(location.hash.slice(1));
 const N = Math.min(parseInt(args.get("n") || "48", 10), 400);
 const PX = Math.min(parseInt(args.get("px") || "2048", 10), 4096);
+// #hold=<MiB>: live memory the page keeps for its whole life (a heavy
+// signed-in app's own heap), so the image decodes after it land near the
+// sandbox's memory limit. Every page is written, so it is really resident.
+const HOLD = Math.min(parseInt(args.get("hold") || "0", 10), 3000);
+const held = [];
+for (let m = 0; m < HOLD; m += 16) {
+  const a = new Uint8Array(16 * 1024 * 1024);
+  for (let k = 0; k < a.length; k += 4096) a[k] = (k >> 12) & 255;
+  held.push(a);
+}
 
 function picture(i) {
   // Noise defeats PNG compression, so each blob decodes to PX*PX*4 bytes.
@@ -57,7 +67,7 @@ function picture(i) {
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   }
   scrollTo(0, 0);
-  document.getElementById("status").textContent = `Gallery ready: ${N} photos.`;
+  document.getElementById("status").textContent = `Gallery ready: ${N} photos (${held.length * 16} MiB held).`;
 })();
 </script>
 </body>
