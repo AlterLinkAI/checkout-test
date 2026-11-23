@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Club test - pane</title>
+<style>body{font:15px/1.4 system-ui,sans-serif;margin:8px}label,input,button{display:block;margin:6px 0}</style>
+</head>
+<body>
+<form id="f">
+<label>Password <input name="password" type="password" autocomplete="current-password"></label>
+<label>Verification code <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+<button type="submit">Sign in</button>
+</form>
+<script>
+// TEST ONLY (ALT-7286): a framed sign-in pane of signin/frames.html; nothing is sent anywhere.
+const pane = (new URLSearchParams(location.search).get("pane") || "pane").replace(/[^a-z]/g, "");
+document.getElementById("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  document.body.innerHTML = "<p>" + pane + " pane: signed in.</p>";
+});
+</script>
+</body>
+</html>
