@@ -13,6 +13,9 @@ const EXTRA_SEED = "TNXPHMA4UT62C3UR";
 // The key the phone-number way of the methods page derives its code from
 // (ALT-7337; one code per 10 min).
 const PHONE_KEY = "O7YQBEA2GT7QJ7MV";
+// The authenticator setup key of the canary's library page (canary.html,
+// ALT-7429), and of nothing else. RFC 6238, SHA-1, six digits, 30 s.
+const CANARY_SEED = "JXE23TWLPYVWVYC7";
 
 // The provider's chooser rows: three made-up accounts, the first a work one.
 const CHOOSER = [

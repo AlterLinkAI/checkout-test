@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Pinecrest Library test - log in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,button{display:block;margin:10px 0}</style>
+</head>
+<body>
+<main>
+<h1>Pinecrest Library test</h1>
+<h2>Log in</h2>
+<form id="f">
+<label>Email <input id="email" name="email" type="email" autocomplete="username" required></label>
+<label>Password <input id="password" name="password" type="password" autocomplete="current-password" required></label>
+<label>Authentication code <input id="totp" name="totp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label>
+<button type="submit">Log In</button>
+</form>
+</main>
+<script>
+// ALT-7429: the operator canary's secrets sign-in, on one page like the
+// TOTP challenge it replaces: any made-up email and password, plus a live
+// authenticator code (key CANARY_SEED). A right code goes to
+// canary-ok.html, a wrong one to canary-fail.html, so the landing address
+// tells the result. Nothing is sent anywhere.
+banner();
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const code = document.getElementById("totp").value.trim();
+  sessionStorage.setItem("signin.canary.email", email);
+  location.href = (await codeOk(CANARY_SEED, code, 30)) ? "canary-ok.html" : "canary-fail.html";
+});
+</script>
+</body>
+</html>
