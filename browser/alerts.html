@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Script dialogs - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="alerts">
+<h1>Script dialogs (TEST ONLY)</h1>
+<p>Here are some examples of the three kinds of script dialog a page can open. Click a button and read the result below. Nothing is sent anywhere.</p>
+<p id="status" role="status">No dialog opened yet.</p>
+<ul>
+  <li><button id="b-alert" type="button">Click for JS Alert</button></li>
+  <li><button id="b-confirm" type="button">Click for JS Confirm</button></li>
+  <li><button id="b-prompt" type="button">Click for JS Prompt</button></li>
+</ul>
+<h2>Result</h2>
+<p id="result"></p>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+function done(kind, text) { document.getElementById("result").textContent = text; record(kind, { text: text }); show("Dialog " + kind + " handled at " + now()); }
+document.getElementById("b-alert").onclick = () => { alert("I am a JS Alert"); done("alert", "You successfully clicked an alert"); };
+document.getElementById("b-confirm").onclick = () => { const r = confirm("I am a JS Confirm"); done("confirm", "You clicked: " + (r ? "Ok" : "Cancel")); };
+document.getElementById("b-prompt").onclick = () => { const r = prompt("I am a JS prompt"); done("prompt", "You entered: " + r); };
+show();
+</script>
+</body>
+</html>

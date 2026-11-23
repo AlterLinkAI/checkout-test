@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Sign in - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="login">
+<h1>Sign in to the Test Portal (TEST ONLY)</h1>
+<p>A made-up sign-in page. Any password is accepted for the made-up user <code>tomsmith-test</code>; nothing is sent anywhere.</p>
+<p id="status" role="status">Not signed in.</p>
+<form id="f" action="secure-area.html" method="get">
+  <label>Username <input id="username" name="u" autocomplete="username"></label>
+  <label>Password <input id="password" name="p" type="password" autocomplete="current-password"></label>
+  <button type="submit">Login</button>
+</form>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>show();</script>
+</body>
+</html>

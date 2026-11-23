@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Request guard probes - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="guard">
+<h1>Request guard probes (TEST ONLY)</h1>
+<p>Everything here points at private or loopback literal addresses (never at a public site). A browser with an address guard refuses each one; the guard's own log says which.</p>
+<p id="status" role="status">Nothing followed yet.</p>
+<ul>
+  <li><a id="g-link-cgnat" href="http://100.64.0.5/">Link to a CGNAT address (100.64.0.5)</a></li>
+  <li><a id="g-download" href="http://127.0.0.6/report.pdf" download="report.pdf">Download link to a loopback address (127.0.0.6)</a></li>
+  <li><a id="g-link-admin" href="http://10.0.0.1/admin">Link to a private address (10.0.0.1)</a></li>
+</ul>
+<form id="g-form" action="http://10.5.5.5/submit" method="post">
+  <label>Note <input name="note" value="made-up"></label>
+  <button id="g-submit" type="submit">Send to a private address (10.5.5.5)</button>
+</form>
+<iframe id="g-frame" title="private frame" src="http://10.4.4.4/" width="300" height="60"></iframe>
+<img id="g-img" alt="" src="http://127.0.0.5/pixel.png" width="1" height="1">
+<script>fetch("http://192.168.4.4/api/status").catch(()=>{});</script>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+document.querySelectorAll("a[id^=g-]").forEach((a) => a.addEventListener("click", () => { record("click", { id: a.id }); show("Followed " + a.id + " at " + now()); }));
+show();
+</script>
+</body>
+</html>

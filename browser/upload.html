@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Document upload - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="upload">
+<h1>Document upload (TEST ONLY)</h1>
+<p>A made-up portal form that takes one file (a CV or a statement). Nothing is sent anywhere: the file name and size go in the address of the result page.</p>
+<p id="status" role="status">No file chosen.</p>
+<form id="f" action="uploaded.html" method="get">
+  <label>Your document <input id="file-upload" name="file" type="file"></label>
+  <button id="file-submit" type="submit">Upload</button>
+</form>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+const inp = document.getElementById("file-upload");
+inp.addEventListener("change", () => {
+  const f = inp.files[0];
+  if (!f) return;
+  pageState.chosen = { name: f.name, size: f.size };
+  record("chosen", pageState.chosen);
+  show("Chosen: " + f.name + " (" + f.size + " bytes).");
+});
+document.getElementById("f").addEventListener("submit", (e) => {
+  const f = inp.files[0];
+  if (!f) { e.preventDefault(); record("refused", { reason: "no file" }); show("Not sent: no file chosen."); return; }
+  e.preventDefault();
+  location.href = "uploaded.html?name=" + encodeURIComponent(f.name) + "&size=" + f.size;
+});
+show();
+</script>
+</body>
+</html>
