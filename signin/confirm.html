@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Club test - confirm your password</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:480px}
+label,input,button{display:block;margin:10px 0}.error{color:#b00020}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// TEST ONLY (ALT-7420): a settings page with a password and a "confirm your
+// password" box. Nothing is sent anywhere; the page checks the two boxes in
+// this browser and shows only the length of what was confirmed.
+banner();
+const main = document.getElementById("main");
+function form(err) {
+  main.innerHTML = '<h1>Harbor Club test</h1><h2>Confirm your password</h2>' +
+    '<p id="demo">Demo password for this page: <code>Confirm-Demo-31</code> (made up, printed on purpose).</p>' +
+    (err ? '<p class="error" id="err">' + err + '</p>' : '') +
+    '<form id="f"><label>Email <input name="email" type="email" autocomplete="username"></label>' +
+    '<label>Password <input name="password" type="password" autocomplete="current-password"></label>' +
+    '<label>Confirm your password <input name="confirm" type="password" autocomplete="new-password"></label>' +
+    '<button type="submit">Save</button></form>';
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const pw = e.target.password.value, again = e.target.confirm.value;
+    const email = (e.target.email.value || "").replace(/[<>&]/g, "");
+    if (!email || !pw) return form("Enter your email and password.");
+    if (pw !== again) return form("The passwords do not match.");
+    main.innerHTML = '<h1>Harbor Club test</h1><h2>Saved</h2><p id="ok">Password confirmed for ' + email +
+      ' (' + pw.length + ' characters). Your settings are saved.</p>';
+  });
+}
+form("");
+</script>
+</body>
+</html>
