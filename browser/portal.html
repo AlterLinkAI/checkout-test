@@ -18,11 +18,14 @@ code is any 5 digits. Nothing is sent anywhere; the sign-in lives in this tab's 
 <pre id="state-json" aria-label="Page state JSON"></pre>
 <script src="state.js"></script>
 <script>
-if (new URLSearchParams(location.search).get("reset") === "1") sessionStorage.clear();
+// ?keep=local keeps the sign-in in localStorage, so another tab or chat of the same
+// browser profile finds it signed in (ALT-1858 control: a sign-in this chat did not make).
+var store = new URLSearchParams(location.search).get("keep") === "local" ? localStorage : sessionStorage;
+if (new URLSearchParams(location.search).get("reset") === "1") { ["portal.stage","portal.phone","portal.hash"].forEach(function (k) { store.removeItem(k); }); }
 Object.assign(pageState, { stage: "phone", phoneTyped: false, codeLength: 0 });
 var step = document.getElementById("step");
 function render() {
-  var st = sessionStorage.getItem("portal.stage") || "phone";
+  var st = store.getItem("portal.stage") || "phone";
   pageState.stage = st;
   if (st === "phone") {
     step.innerHTML = '<form id="f"><label>Phone number<input id="phone" name="phone" autocomplete="tel"></label><button>Next</button></form>';
@@ -31,8 +34,8 @@ function render() {
       var p = document.getElementById("phone").value.replace(/\D/g, "");
       if (p.length < 6) return show("Enter a phone number.");
       pageState.phoneTyped = true; record("phone_ok");
-      sessionStorage.setItem("portal.phone", p);
-      sessionStorage.setItem("portal.stage", "code"); render();
+      store.setItem("portal.phone", p);
+      store.setItem("portal.stage", "code"); render();
     });
     show("Signed out.");
   } else if (st === "code") {
@@ -42,15 +45,15 @@ function render() {
       var c = document.getElementById("code").value.trim();
       if (!/^\d{5}$/.test(c)) return show("That code is not valid.");
       pageState.codeLength = c.length; record("signed_in");
-      sessionStorage.setItem("portal.stage", "in"); render();
+      store.setItem("portal.stage", "in"); render();
     });
     show("Waiting for the code.");
   } else {
-    var a = sessionStorage.getItem("portal.hash");
+    var a = store.getItem("portal.hash");
     if (!a) {
       var h = "", x = "0123456789abcdef";
       for (var i = 0; i < 32; i++) h += x[Math.floor(Math.random() * 16)];
-      a = h; sessionStorage.setItem("portal.hash", h);
+      a = h; store.setItem("portal.hash", h);
     }
     step.innerHTML = '<h2>Your application</h2><div class="row"><b>App api_id:</b> <code id="api-id">1234567</code></div>' +
       '<div class="row"><b>App api_hash:</b> <code id="api-hash">' + a + '</code></div>';
