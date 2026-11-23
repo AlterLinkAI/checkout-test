@@ -82,3 +82,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Town guide (ALT-5778)
 
 `city/` is a made-up town guide for Hallerberg (it does not exist), for live checks of background jobs started from a call, so they never search a real map or the web. `cafes.html` lists five cafes; each cafe's opening hours are only on its own page (`cafe-1..5.html`). `hardware.html` lists five hardware stores; parking is only on each store's page (`store-1..5.html`; stores 2, 4 and 5 have a car park). `quillon.html` names the maker of the Quillon K7 keyboard and the year it was founded; its headquarters is only on `quillon-about.html`. Static pages, nothing is sent anywhere.
+
+## Endless next-link page (ALT-763)
+
+`endless/index.html?p=N`: a made-up harbour log whose "Next" link always leads to `?p=N+1` (without a script, to `?p=2`). Every page reads the same, and none holds the "ORDER SHIPPED" entry it promises, so a twin that follows the links loops on one read, for live checks of the loop supervisor's stop.
