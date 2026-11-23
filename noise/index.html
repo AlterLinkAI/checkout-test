@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Status board - Alder Test Bank</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0 }
+  main { padding: 24px; max-width: 640px }
+  button { display: block; margin: 10px 0 }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up bank and data only. Nothing is sold and nothing is charged.</div>
+<main id="main">
+<h1>Alder Test Bank</h1>
+<p id="line">Your transfer is waiting for the bank's review.</p>
+<p id="noise"></p>
+<button type="button" id="refresh">Refresh status</button>
+</main>
+<script>
+/*
+  ALT-7296 (AlterLink): a page that changes its text by itself and never
+  settles, for the noise guard of a task's page wait. The status line above
+  never changes; the buttons never change.
+    noise/#mode=clock      the second line shows the time, every second.
+    noise/#mode=carousel   the second line shows one of three offers, a new
+                           one every 4 s, round and round.
+  Nothing is sent anywhere.
+*/
+const q = new URLSearchParams(location.hash.slice(1));
+const MODE = q.get("mode") === "carousel" ? "carousel" : "clock";
+const OFFERS = [
+  "Offer: open a savings pot today.",
+  "Offer: ask about the travel card.",
+  "Offer: switch to paperless statements."
+];
+const el = document.getElementById("noise");
+function tick() {
+  if (MODE === "clock") {
+    el.textContent = "Bank time " + new Date().toISOString().slice(11, 19);
+  } else {
+    el.textContent = OFFERS[Math.floor(Date.now() / 4000) % OFFERS.length];
+  }
+}
+tick();
+setInterval(tick, 500);
+</script>
+</body>
+</html>
