@@ -18,7 +18,7 @@
   <button type="button" id="cancel">Cancel payment</button>
 </div>
 <p>For the test: the "bank app" is <a href="bank-app.html" target="_blank" rel="noopener">bank-app.html</a>, opened by
-the owner in another tab of the same browser (a takeover). <code>?expires=120</code> ends the wait after that many seconds.</p>
+the owner in another tab of the same browser (a takeover). <code>?expires=120</code> ends the wait after that many seconds. <code>?approve_after=40</code> makes the fake bank approve by itself after that many seconds.</p>
 <h2>Page state</h2>
 <pre id="state-json" aria-label="Page state JSON"></pre>
 <script src="state.js"></script>
@@ -59,6 +59,11 @@ document.getElementById("cancel").addEventListener("click", () => {
   record("cancelled");
   show("Payment cancelled.");
 });
+// ALT-1010: `?approve_after=<s>` is the fake bank approving by itself that many
+// seconds after the page opens (the bank's own action, as if the owner had pressed
+// Approve in his app); Continue is then enabled and the page says so.
+const approveAfter = Math.max(0, parseInt(new URLSearchParams(location.search).get("approve_after") || "0", 10) || 0);
+if (approveAfter) setTimeout(() => approve("bank-timer"), approveAfter * 1000);
 if (expires) setTimeout(() => {
   if (pageState.approved || pageState.cancelled) return;
   pageState.expired = true;
