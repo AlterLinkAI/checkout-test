@@ -1,6 +1,8 @@
 # checkout-test
 
-TEST ONLY (AlterLink ALT-6067, ALT-6295, ALT-5436): a look-alike checkout for live checks of the twin's pay guard. The shop ("Lumen Test Shop") and all data are made up. Nothing is sold, no payment provider is called, and nothing is charged. Pages is switched off and the repo archived after the runs.
+TEST ONLY (AlterLink ALT-6067, ALT-6295, ALT-5436): a look-alike checkout for live checks of the twin's pay guard. The shop ("Lumen Test Shop") and all data are made up. Nothing is sold, no payment provider is called, and nothing is charged.
+
+Keep GitHub Pages published and the repo unarchived (ALT-7405). Every cell's browser probe (alterlink-core `tools/browser/probe.py`, core #1659) opens `probe.html` here every half hour, and the live checks of the twin use the pages below in place of real sites. Switching Pages off or archiving the repo breaks the probe on every cell and those checks.
 
 `index.html#case=none|total|shop|frame`:
 
