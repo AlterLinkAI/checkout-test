@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Lumen Test Developer Portal - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}
+label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px;width:100%;max-width:320px}.row{border:1px solid #ccc;border-radius:8px;padding:10px 14px;margin:10px 0}</style>
+</head>
+<body data-page="portal">
+<h1>Lumen Test Developer Portal (TEST ONLY)</h1>
+<p>A made-up developer portal for live checks of ALT-1858: the owner enters his phone and the one-time code in his own form
+and the twin types them here; then the twin saves the app's api_id and api_hash. Any phone number is accepted; the
+code is any 5 digits. Nothing is sent anywhere; the sign-in lives in this tab's sessionStorage (<code>?reset=1</code> clears it).</p>
+<p id="status" role="status">Signed out.</p>
+<div id="step"></div>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script src="state.js"></script>
+<script>
+if (new URLSearchParams(location.search).get("reset") === "1") sessionStorage.clear();
+Object.assign(pageState, { stage: "phone", phoneTyped: false, codeLength: 0 });
+var step = document.getElementById("step");
+function render() {
+  var st = sessionStorage.getItem("portal.stage") || "phone";
+  pageState.stage = st;
+  if (st === "phone") {
+    step.innerHTML = '<form id="f"><label>Phone number<input id="phone" name="phone" autocomplete="tel"></label><button>Next</button></form>';
+    step.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var p = document.getElementById("phone").value.replace(/\D/g, "");
+      if (p.length < 6) return show("Enter a phone number.");
+      pageState.phoneTyped = true; record("phone_ok");
+      sessionStorage.setItem("portal.phone", p);
+      sessionStorage.setItem("portal.stage", "code"); render();
+    });
+    show("Signed out.");
+  } else if (st === "code") {
+    step.innerHTML = '<form id="f"><p>We sent a code to your app.</p><label>Confirmation code<input id="code" name="code" inputmode="numeric" autocomplete="one-time-code"></label><button>Sign in</button></form>';
+    step.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var c = document.getElementById("code").value.trim();
+      if (!/^\d{5}$/.test(c)) return show("That code is not valid.");
+      pageState.codeLength = c.length; record("signed_in");
+      sessionStorage.setItem("portal.stage", "in"); render();
+    });
+    show("Waiting for the code.");
+  } else {
+    var a = sessionStorage.getItem("portal.hash");
+    if (!a) {
+      var h = "", x = "0123456789abcdef";
+      for (var i = 0; i < 32; i++) h += x[Math.floor(Math.random() * 16)];
+      a = h; sessionStorage.setItem("portal.hash", h);
+    }
+    step.innerHTML = '<h2>Your application</h2><div class="row"><b>App api_id:</b> <code id="api-id">1234567</code></div>' +
+      '<div class="row"><b>App api_hash:</b> <code id="api-hash">' + a + '</code></div>';
+    show("Signed in with the phone entered above.");
+  }
+}
+render();
+</script>
+</body>
+</html>
