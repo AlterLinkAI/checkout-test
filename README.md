@@ -44,6 +44,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - `download.html`: CSV and PDF file links, the PDF in a new tab (viewer, no download event), a file made in the page, a delayed one (3 s), and one behind a confirm step. Every file carries a `BT-TEST-...` reference in its text.
 - `frames.html`: three voucher fields that a plain page read does not reach: in a same-origin frame (`frame-inner.html`), in an open shadow root and in a closed shadow root. Each "Apply" is recorded in `applied`; the status counts "N of 3 applied".
 - `owner-step.html` + `bank-app.html`: "Confirm the payment in your bank app". Continue stays disabled (a forced or script click does nothing) until the owner opens `bank-app.html` in another tab of the same browser and presses "Approve payment". `?expires=<s>` ends the wait; Cancel ends it too. Nothing is charged.
+- `react-input.html` (ALT-1001): a customer-number field that behaves like a framework-controlled input: a value written by a script (or a synthetic input event) is put back to the field's own state, only real key presses stick. `#state-json` shows `length`, `typedByKeys`, `restored`.
 - `secrets.html` (ALT-1738, ALT-1771, ALT-1777): a made-up OAuth client page. A Client ID, two masked client secrets (`****Zq7w`, `****Pm4k`, never readable), and "Add secret", which makes up a new secret in the page at click time, shows it once in a labelled read-only input, with a copy button whose accessible name is "Copy to clipboard: <value>"; the copy shows the flash "Client secret was copied" with a close glyph.
 - `portal.html` (ALT-1858): a made-up developer portal: phone, then a 5-digit code (any), then "App api_id" and "App api_hash". For checking that a sign-in made with values the owner entered in his own form counts as his account. `?reset=1` signs out.
 
@@ -56,5 +57,9 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Language articles (ALT-4536)
 
 `articles/en-1..3.html` and `articles/es-1..3.html`: short made-up articles in English and in Spanish (our own text), so live checks of the reply language never open a real site.
+
+## Peak heights (ALT-3976)
+
+`heights/` is a page of three made-up peaks and heights (Alder, Birch, Cedar) for live voice checks that ask the twin to read a page in the background. It contacts nothing.
 
 `articles/long-en.html` and `articles/long-ru.html` (ALT-5247, ALT-6361): one long made-up article (about 600 words) in English and in Russian, our own text, so live checks that make the twin read a page and answer in five or six sentences never open a real site.
