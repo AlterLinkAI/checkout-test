@@ -38,6 +38,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 - An edit shows "Saving..." and then, 0.7 s after the last key, "Saved <UTC time>". A line under the blocks reads `Saved at <time>: block <id> now reads "<text>"`.
 - The full state is shown as JSON in `#state-json` (title, blocks with id and text, saved, savedAt, edits, lastEdit, failedSaves), also as `window.__notesState`. A reload keeps saved edits.
 - `?reset=1` starts from the seed page. `?session=expired` makes every save fail: a "Your session has expired" banner, status "Not saved - session expired", `saved: false`, and nothing is kept after a reload.
+- The expired session sticks in that browser (ALT-7079): the page opened again without `?session=expired` is still expired, until `?reset=1` signs the browser back in.
 
 ## Browser pages (ALT-6914)
 
