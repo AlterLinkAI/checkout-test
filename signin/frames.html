@@ -32,9 +32,13 @@ const root = document.getElementById("staff").attachShadow({ mode: "open" });
 function staff() {
   root.innerHTML = '<form id="s"><label>Staff password <input name="password" type="password" ' +
     'autocomplete="current-password"></label><label>Staff code <input name="code" inputmode="numeric" ' +
-    'autocomplete="one-time-code" maxlength="6"></label><button type="submit">Sign in</button></form>';
+    'autocomplete="one-time-code" maxlength="6"></label><button type="submit">Sign in</button><p id="err" style="color:#b00020"></p></form>';
   root.getElementById("s").addEventListener("submit", (e) => {
     e.preventDefault();
+    if (!e.target.password.value) {
+      root.getElementById("err").textContent = "Enter your password to sign in.";
+      return;
+    }
     root.innerHTML = "<p>Staff pane: signed in.</p>";
   });
 }
