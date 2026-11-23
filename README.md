@@ -86,4 +86,4 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 
 ## Endless next-link page (ALT-763)
 
-`endless/index.html?p=N`: a made-up harbour log whose "Next" link always leads to `?p=N+1` (without a script, to `?p=2`). Every page reads the same, and none holds the "ORDER SHIPPED" entry it promises, so a twin that follows the links loops on one read, for live checks of the loop supervisor's stop.
+`endless/index.html?p=N`: a made-up harbour log whose "Next" link always leads to `?p=N+1` (without a script, to `?p=2`). Every page reads the same, and none holds the "ORDER SHIPPED" entry it promises, so a twin that follows the links loops on one read, for live checks of the loop supervisor's stop. `endless/same.html` is the same page whose "Next" leads back to itself, so every read returns the identical page and address.
