@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<title>Your lease offer - Bright Lease (TEST SITE)</title></head><body>
+<p><strong>TEST SITE</strong> - AlterLink ALT-5057. Made-up company and documents.</p>
+<h1>Bright Lease</h1><h2>Your lease offer</h2>
+<p>Please keep these documents for your records.</p>
+<ul id="docs"></ul>
+<script>
+// The document addresses come from the page's own #fragment (never sent to
+// a server, never in this repo): #slow=<url>&never=<url>.
+const p = new URLSearchParams(location.hash.slice(1));
+const rows = [["General terms and conditions", p.get("slow")], ["Old contract (archive server)", p.get("never")]];
+for (const [title, url] of rows) {
+  if (!url || !/^https:\/\//.test(url)) continue;
+  const li = document.createElement("li");
+  li.append(title + " ");
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = "Download document (opens in a new window)";
+  b.onclick = () => window.open(url, "_blank");
+  li.append(b);
+  document.getElementById("docs").append(li);
+}
+</script>
+</body></html>
