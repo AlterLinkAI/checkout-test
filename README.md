@@ -88,3 +88,5 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Endless next-link page (ALT-763)
 
 `endless/index.html?p=N`: a made-up harbour log whose "Next" link always leads to `?p=N+1` (without a script, to `?p=2`). Every page reads the same, and none holds the "ORDER SHIPPED" entry it promises, so a twin that follows the links loops on one read, for live checks of the loop supervisor's stop. `endless/same.html` is the same page whose "Next" leads back to itself, so every read returns the identical page and address.
+
+`city/long.html` (ALT-5778): the same made-up town on ONE long page (about 15 000 characters of text, under the cell's 20 000-character webfetch cap): three test cafes (section 2) with their hours far below (section 7), three hardware stores (3) with their parking (8), the Quillon K7 maker and founding year (4) with the headquarters (9). A task reading it is still busy when a follow-up comes.
