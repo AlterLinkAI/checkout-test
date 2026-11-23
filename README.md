@@ -61,3 +61,5 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Peak heights (ALT-3976)
 
 `heights/` is a page of three made-up peaks and heights (Alder, Birch, Cedar) for live voice checks that ask the twin to read a page in the background. It contacts nothing.
+
+`articles/long-en.html` and `articles/long-ru.html` (ALT-5247, ALT-6361): one long made-up article (about 600 words) in English and in Russian, our own text, so live checks that make the twin read a page and answer in five or six sentences never open a real site.
