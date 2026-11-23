@@ -56,3 +56,5 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 ## Language articles (ALT-4536)
 
 `articles/en-1..3.html` and `articles/es-1..3.html`: short made-up articles in English and in Spanish (our own text), so live checks of the reply language never open a real site.
+
+`articles/long-en.html` and `articles/long-ru.html` (ALT-5247, ALT-6361): one long made-up article (about 600 words) in English and in Russian, our own text, so live checks that make the twin read a page and answer in five or six sentences never open a real site.
