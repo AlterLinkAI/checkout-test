@@ -14,6 +14,8 @@ TEST ONLY (AlterLink ALT-6067, ALT-6295, ALT-5436): a look-alike checkout for li
 This repo has no CI. Its PRs merge through the AlterLink workspace tool like every other repo: `python3 dev/merge_chain/merge_chain.py AlterLinkAI/checkout-test <PR> --card ALT-<n>` (ALT-6608), never by hand.
 
 `lease/` (ALT-5057): an offer page whose three documents open in a new tab. Offer and schedule answer at once; the general terms come through five 5 s delay hops (app.requestly.io delay, httpbin.dev redirect-to), about 25-30 s before the first byte, as a slow document server. "Old contract" opens httpbin.dev/delay/150, a server that sends nothing for 150 s. PDFs are made up and carry `BL-TEST-<doc>` references.
+`probe.html` (ALT-7405): a static page with the title "AlterLink browser probe" that every cell's browser probe (core `tools/browser/probe.py`) opens every half hour instead of a third-party site. It loads nothing else. Keep its title and keep it published while core's probe names it.
+
 ## Sign-in steps (ALT-5500)
 
 `signin/` holds made-up sign-in steps for live checks of the twin. Each page checks the code in the browser against `signin/fixture.js` (keys and accounts published on purpose) and sends nothing anywhere.
