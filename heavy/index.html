@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>Heavy gallery test</title>
+<style>
+  body { font: 16px sans-serif; margin: 0; padding: 16px; }
+  img { display: block; width: 100%; height: auto; margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST ONLY: made-up images, nothing is sold or sent anywhere.</div>
+<h1>Harbor Photo Archive (test)</h1>
+<p id="status" role="status">Loading the gallery&hellip;</p>
+<main id="gallery"></main>
+<script>
+// TEST ONLY (ALT-5569): a page that holds many large decoded images at once,
+// like a heavy signed-in app. It fills the renderer's discardable image
+// memory (decoded bitmaps live in discardable shared memory) to reproduce the
+// sandbox's out-of-memory renderer crash. Address: #n=<images>&px=<side>,
+// default n=48, px=2048 (about 16 MiB decoded each). Everything is drawn in
+// this browser; the page loads nothing from any server and sends nothing.
+const args = new URLSearchParams(location.hash.slice(1));
+const N = Math.min(parseInt(args.get("n") || "48", 10), 400);
+const PX = Math.min(parseInt(args.get("px") || "2048", 10), 4096);
+
+function picture(i) {
+  // Noise defeats PNG compression, so each blob decodes to PX*PX*4 bytes.
+  const c = document.createElement("canvas");
+  c.width = c.height = PX;
+  const x = c.getContext("2d");
+  const img = x.createImageData(PX, PX);
+  let s = (i + 1) * 2654435761 >>> 0;
+  for (let k = 0; k < img.data.length; k += 4) {
+    s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0;
+    img.data[k] = s & 255; img.data[k + 1] = (s >> 8) & 255; img.data[k + 2] = (s >> 16) & 255; img.data[k + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  x.fillStyle = "#fff"; x.font = `${PX / 8}px sans-serif`; x.fillText(`Photo ${i + 1}`, PX / 16, PX / 4);
+  return new Promise((ok) => c.toBlob(ok, "image/png"));
+}
+
+(async () => {
+  const g = document.getElementById("gallery");
+  for (let i = 0; i < N; i++) {
+    const im = new Image();
+    im.alt = `Photo ${i + 1}`;
+    im.src = URL.createObjectURL(await picture(i));
+    await im.decode().catch(() => {});
+    g.appendChild(im);
+    document.getElementById("status").textContent = `Loaded ${i + 1} of ${N} photos.`;
+  }
+  // Paint every image again so all decodes are held at the same time.
+  for (let y = 0; y < document.body.scrollHeight; y += innerHeight) {
+    scrollTo(0, y);
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  }
+  scrollTo(0, 0);
+  document.getElementById("status").textContent = `Gallery ready: ${N} photos.`;
+})();
+</script>
+</body>
+</html>
