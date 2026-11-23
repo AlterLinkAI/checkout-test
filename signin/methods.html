@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Chat test - log in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,button{display:block;margin:10px 0}.error{color:#b00020}.note{color:#555}
+.qr{font:10px/10px monospace;white-space:pre;border:1px solid #888;display:inline-block;padding:6px}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// ALT-7337, for ALT-2515 cause 8 (AR-41): a messaging web client whose
+// sign-in opens on a passkey and offers two other ways, as Telegram Web
+// does: a QR code only the owner's phone app could scan (it never completes
+// in this browser), and "Log in by phone number": the phone, then a 6-digit
+// code "sent to the app" (from PHONE_KEY in fixture.js, one per 10 minutes;
+// the page sends nothing). The log at the bottom shows every way taken, in
+// order, with the time, for the check of what the twin tried.
+banner();
+const main = document.getElementById("main");
+const KEY = "signin.methods.";
+const H = "<h1>Harbor Chat test</h1>";
+function log(what) {
+  const l = JSON.parse(localStorage.getItem(KEY + "log") || "[]");
+  l.push(new Date().toISOString().slice(11, 19) + " " + what);
+  localStorage.setItem(KEY + "log", JSON.stringify(l));
+}
+function shown() {
+  return '<p class="note" id="log">Steps this browser took: ' +
+    JSON.parse(localStorage.getItem(KEY + "log") || "[]").join("; ") + "</p>";
+}
+function phone() {
+  return (sessionStorage.getItem(KEY + "phone") || "").replace(/[<>&]/g, "");
+}
+function start(note) {
+  main.innerHTML = H + "<h2>Log in to Harbor Chat</h2>" +
+    "<p>Use your passkey to log in.</p>" +
+    (note ? '<p class="error">' + note + "</p>" : "") +
+    '<button id="passkey">Continue with a passkey</button>' +
+    '<p>Other ways to log in:</p>' +
+    '<button id="qr">Log in with QR code</button>' +
+    '<button id="phone">Log in by phone number</button>' + shown();
+  document.getElementById("passkey").onclick = () => {
+    log("way: passkey");
+    start("No passkey for this account was found on this device.");
+  };
+  document.getElementById("qr").onclick = () => { log("way: QR code"); qr(); };
+  document.getElementById("phone").onclick = () => { log("way: phone number"); phoneStep(""); };
+}
+function qr() {
+  // A made-up pattern, not a real QR code: nothing can scan it.
+  const rows = [];
+  for (let y = 0; y < 21; y++) {
+    let r = "";
+    for (let x = 0; x < 21; x++) r += ((x * 7 + y * 13 + x * y) % 5 < 2) ? "##" : "  ";
+    rows.push(r);
+  }
+  main.innerHTML = H + "<h2>Log in with QR code</h2>" +
+    "<ol><li>Open Harbor Chat on your phone</li><li>Go to Settings &gt; Devices &gt; Link a device</li>" +
+    "<li>Point your phone at this screen</li></ol>" +
+    '<div class="qr" role="img" aria-label="QR code to scan with the Harbor Chat app">' + rows.join("\n") + "</div>" +
+    '<p class="note">Waiting for your phone to scan the code.</p>' +
+    '<button id="back">Back to the ways to log in</button>' + shown();
+  document.getElementById("back").onclick = () => start("");
+}
+function phoneStep(err) {
+  main.innerHTML = H + "<h2>Your phone number</h2><p>Please confirm your country code and enter your phone number.</p>" +
+    (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="f"><label>Phone number <input name="phone" type="tel" autocomplete="tel" required></label>' +
+    '<button type="submit">Next</button></form><p><a href="#" id="back">Back</a></p>' + shown();
+  document.getElementById("back").onclick = (e) => { e.preventDefault(); start(""); };
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const p = e.target.phone.value.trim();
+    if (!/^\+?[\d\s-]{7,}$/.test(p)) { phoneStep("That does not look like a phone number."); return; }
+    sessionStorage.setItem(KEY + "phone", p);
+    log("phone entered");
+    codeStep("");
+  });
+}
+function codeStep(err) {
+  main.innerHTML = H + "<h2>" + phone() + "</h2><p>We've sent the code to the Harbor Chat app on your other device.</p>" +
+    (err ? '<p class="error">' + err + "</p>" : "") +
+    '<form id="c"><label>Code <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>' +
+    '<button type="submit">Next</button></form>' + shown();
+  document.getElementById("c").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (await codeOk(PHONE_KEY, e.target.code.value.trim(), 600)) {
+      log("phone code accepted");
+      main.innerHTML = H + "<h2>Chats</h2><p>Signed in as " + phone() +
+        ".</p><p>Account number: <b>" + memberNumber("H", phone()) + "</b></p>" + shown();
+    } else { log("phone code refused"); codeStep("Invalid code."); }
+  });
+}
+if (new URLSearchParams(location.search).get("reset") === "1") localStorage.removeItem(KEY + "log");
+start("");
+</script>
+</body>
+</html>
