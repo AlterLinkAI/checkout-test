@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- ALT-7153 test fixture, test cells only (on a non-test cell it would really load https://my.telegram.org/). No credentials, no tracking. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TEST SITE - redirect check: js</title>
+<meta name="robots" content="noindex">
+<script>
+setTimeout(() => location.replace('https://my.telegram.org/'), 1000);
+</script>
+</head>
+<body>
+<h1>TEST SITE - redirect check: js</h1>
+</body>
+</html>

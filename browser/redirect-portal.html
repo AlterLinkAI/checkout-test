@@ -1,33 +1,17 @@
 <!doctype html>
-<!--
-  TEST FIXTURE for ALT-7153 (request guard must refuse redirects to a real site).
-  ONLY TEST CELLS may open this page: on a non-test cell it would really load https://my.telegram.org/.
-  Modes: default = meta refresh after 1 s; ?mode=js = location.replace after 1 s; ?mode=link = plain link to click.
-  No credentials, no tracking.
--->
+<!-- ALT-7153 test fixture, test cells only. Index of the redirect pages; this page does not redirect. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TEST SITE - redirect check</title>
+<title>TEST SITE - redirect check: index</title>
 <meta name="robots" content="noindex">
-<meta http-equiv="refresh" content="1;url=https://my.telegram.org/">
-<script>
-(function () {
-  var mode = new URLSearchParams(location.search).get('mode');
-  if (mode === 'js' || mode === 'link') {
-    // js/link mode: drop the default meta refresh
-    var m = document.querySelector('meta[http-equiv="refresh"]');
-    if (m) m.remove();
-  }
-  if (mode === 'js') setTimeout(function () { location.replace('https://my.telegram.org/'); }, 1000);
-  if (mode === 'link') document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('go').hidden = false;
-  });
-})();
-</script>
 </head>
 <body>
-<h1>TEST SITE - redirect check</h1>
-<p><a id="go" href="https://my.telegram.org/" hidden>Continue to the portal</a></p>
+<h1>TEST SITE - redirect check: index</h1>
+<ul>
+<li><a href="redirect-portal-meta.html">meta refresh</a></li>
+<li><a href="redirect-portal-js.html">js redirect</a></li>
+<li><a href="redirect-portal-link.html">plain link</a></li>
+</ul>
 </body>
 </html>
