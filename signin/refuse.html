@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Willow Post test - sign in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}
+label,input,button{display:block;margin:10px 0}.error{color:#b00020}.log{color:#555;font-size:13px}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// ALT-3590: a sign-in whose two-step code is never accepted. Any email and
+// password pass; then every 6-digit code, from any source, is refused with
+// the same answer and the code form comes back, as a site that turns down
+// every code. Nothing is sent anywhere. The codes this browser sent are
+// counted and listed (#state-json, window.__pageState); ?reset=1 clears.
+banner();
+const main = document.getElementById("main");
+const KEY = "signin.refuse.";
+if (new URLSearchParams(location.search).get("reset") === "1") {
+  for (const k of Object.keys(sessionStorage)) if (k.startsWith(KEY)) sessionStorage.removeItem(k);
+}
+function state() {
+  return {
+    email: sessionStorage.getItem(KEY + "email") || null,
+    codes: JSON.parse(sessionStorage.getItem(KEY + "codes") || "[]"),
+  };
+}
+function show(html) {
+  const s = state();
+  window.__pageState = s;
+  main.innerHTML = html + '<p class="log" id="status">Codes sent and refused: ' + s.codes.length +
+    "</p><pre class=\"log\" id=\"state-json\">" + JSON.stringify(s).replace(/[<>&]/g, "") + "</pre>";
+}
+function signIn() {
+  show('<h1>Willow Post test</h1><h2>Sign in</h2><form id="f">' +
+    '<label>Email <input name="email" type="email" autocomplete="username" required></label>' +
+    '<label>Password <input name="password" type="password" autocomplete="current-password" required></label>' +
+    '<button type="submit">Sign in</button></form>');
+  document.getElementById("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    sessionStorage.setItem(KEY + "email", e.target.email.value);
+    code("");
+  });
+}
+function code(err) {
+  show('<h1>Willow Post test</h1><h2>Two-step verification</h2>' +
+    "<p>Enter the 6-digit code from your authenticator app.</p>" +
+    (err ? '<p class="error" role="alert">' + err + "</p>" : "") +
+    '<form id="c"><label>Verification code <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>' +
+    '<button type="submit">Verify</button></form>');
+  document.getElementById("c").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const s = state();
+    s.codes.push({ at: new Date().toISOString(), digits: e.target.code.value.trim().length });
+    sessionStorage.setItem(KEY + "codes", JSON.stringify(s.codes));
+    code("That code didn't work. Check it and try again.");
+  });
+}
+if (state().email) code(""); else signIn();
+</script>
+</body>
+</html>
