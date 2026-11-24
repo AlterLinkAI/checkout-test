@@ -1,0 +1,50 @@
+{
+ "dac1a9895b89ebd7eaf4ed1d64fdfe36db43f7d332a519d6c057119b0295c245": {
+  "photo": "photos/star-mug.png",
+  "answer": "Lumen Star Mug (teal, yellow star)",
+  "results": [
+   {
+    "title": "Lumen Star Mug (teal, yellow star)",
+    "image": "results/star-mug-match.png",
+    "caption": "Visually similar: same shape and colours."
+   },
+   {
+    "title": "Lumen Plain Mug (blue, white star)",
+    "image": "results/star-mug-decoy.png",
+    "caption": "Visually similar: same shape, other colours."
+   }
+  ]
+ },
+ "7f695dc8bf1fec0d7a9232b93b2e42efb0dc2b5b958a8dd2c1d21eef382b18cb": {
+  "photo": "photos/yellow-kite.png",
+  "answer": "Fernhill Diamond Kite (yellow)",
+  "results": [
+   {
+    "title": "Fernhill Diamond Kite (yellow)",
+    "image": "results/yellow-kite-match.png",
+    "caption": "Visually similar: same shape and colours."
+   },
+   {
+    "title": "Fernhill Diamond Kite (orange)",
+    "image": "results/yellow-kite-decoy.png",
+    "caption": "Visually similar: same shape, other colours."
+   }
+  ]
+ },
+ "6e81a06347e9c2b112b325d0d519565a2a73b69c2d23bef7a8a39d34ab9a82f9": {
+  "photo": "photos/purple-lamp.png",
+  "answer": "Harbor Desk Lamp (purple shade)",
+  "results": [
+   {
+    "title": "Harbor Desk Lamp (purple shade)",
+    "image": "results/purple-lamp-match.png",
+    "caption": "Visually similar: same shape and colours."
+   },
+   {
+    "title": "Harbor Desk Lamp (pink shade)",
+    "image": "results/purple-lamp-decoy.png",
+    "caption": "Visually similar: same shape, other colours."
+   }
+  ]
+ }
+}
