@@ -1,0 +1,1 @@
+{"note": "TEST ONLY: a made-up status summary for AlterLink checks; static.", "page": {"name": "Harbor Code Hosting (test)"}, "status": {"indicator": "none", "description": "All Systems Operational"}, "components": [{"name": "Web", "status": "operational"}, {"name": "API", "status": "operational"}], "incidents": []}

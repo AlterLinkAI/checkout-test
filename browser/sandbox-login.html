@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Login Page - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}label{display:block;margin:10px 0}input{display:block;font:inherit;margin-top:3px}</style>
+</head>
+<body data-page="sandbox-login">
+<h1>Login Page (TEST ONLY)</h1>
+<p>This is a made-up practice site. Enter <b>practice-user</b> for the username and <b>Practice-Pass-42</b> for the password. Nothing is sent anywhere: a right login is remembered in this browser only (sessionStorage), and <a href="sandbox-secure.html">the secure area</a> shows only to a browser that logged in.</p>
+<p id="flash" role="status"></p>
+<form id="f">
+  <label>Username <input id="username" name="username" autocomplete="username"></label>
+  <label>Password <input id="password" name="password" type="password" autocomplete="current-password"></label>
+  <button type="submit">Login</button>
+</form>
+<script>
+var flash = document.getElementById('flash');
+if (location.hash === '#must-login') flash.textContent = 'You must login to view the secure area!';
+document.getElementById('f').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var ok = document.getElementById('username').value === 'practice-user' &&
+           document.getElementById('password').value === 'Practice-Pass-42';
+  if (ok) { sessionStorage.setItem('sandbox-login', '1'); location.href = 'sandbox-secure.html'; }
+  else { flash.textContent = 'Your username or password is invalid!'; }
+});
+</script>
+</body>
+</html>

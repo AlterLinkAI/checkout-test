@@ -14,6 +14,7 @@ matched to the button that gave it.</p>
 <p id="status" role="status">Nothing downloaded yet.</p>
 <ul>
   <li><a id="d-csv" href="files/orders.csv" download="orders.csv">Download the order list (CSV)</a> - a plain file link</li>
+  <li><a id="d-txt" href="files/sample.txt" download="sample.txt">sample.txt</a> - a plain text file link</li>
   <li><a id="d-pdf" href="files/invoice.pdf" download="invoice.pdf">Download the invoice (PDF)</a> - a plain file link</li>
   <li><a id="d-newtab" href="files/invoice.pdf" target="_blank" rel="noopener">Open the invoice in a new tab</a> - the browser's PDF viewer, no download event</li>
   <li><button type="button" id="d-blob">Export my notes (TXT)</button> - the file is made in the page</li>
@@ -39,6 +40,7 @@ function save(name, type, text, id) {
   started(id, name);
 }
 document.getElementById("d-csv").addEventListener("click", () => started("d-csv", "orders.csv"));
+document.getElementById("d-txt").addEventListener("click", () => started("d-txt", "sample.txt"));
 document.getElementById("d-pdf").addEventListener("click", () => started("d-pdf", "invoice.pdf"));
 document.getElementById("d-newtab").addEventListener("click", () => {
   record("opened in a new tab", { id: "d-newtab", file: "invoice.pdf" });

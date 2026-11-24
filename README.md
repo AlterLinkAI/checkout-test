@@ -118,6 +118,20 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 
 `lease/tf.html#slow=<url>&never=<url>` (ALT-5057): the same offer shape, its two new-tab documents taken from the fragment, so a check can point them at the test fakes host without the fakes' secret path ever being in this repo or sent to GitHub.
 
+## Stand-ins for the core eval cases (ALT-7889)
+
+Pages that core's eval cases (`alterlink-core` `src/alterlink_core/eval/golden/cases.yaml`) open in place of real sites, so a case runs the same on the stand and on a test cell, whose page rule admits only this site and our fakes. All made up; nothing is sent anywhere.
+
+- `browser/player.html` (ALT-1006): a lesson page with a video player in a sandboxed frame without `allow-same-origin` (`player-frame.html`: title "Lantern Walk, Episode 3", Play, Mute, `0:00 / 3:12`). The frame's origin is opaque, so the page's own script cannot read into it.
+- `browser/shadow-search.html` (ALT-1006): "Quill Search": the search field and button sit in a CLOSED shadow root of `<quill-search>`. `#state-json` shows what was typed and whether Search was pressed.
+- `browser/windows.html` -> `windows-new.html`: a "Click Here" link that opens a second window headed "New Window".
+- `browser/consent.html` + `consent-frame.html`: a made-up news front page covered by a privacy banner in a sandboxed (opaque-origin) frame, with Accept all / Reject all; the status line says which was chosen.
+- `browser/pay-button.html` -> `pay-sheet.html`: a "Pay with Test Wallet" button that opens a made-up payment sheet in a new window. No pay button, nothing charged.
+- `browser/people-table.html`: two made-up tables with a Due column (`jdoe@example.com` is the one at $100.00 in the first).
+- `browser/sandbox-login.html` -> `sandbox-secure.html`: a practice login that prints its own made-up credentials (`practice-user` / `Practice-Pass-42`); the secure page shows only in a browser that logged in (sessionStorage) and otherwise sends it back with "You must login to view the secure area!".
+- `browser/download.html` now also links `files/sample.txt`.
+- `api/`: static JSON and Atom files for the watch cases: `status.json`, `summary.json` (a made-up status page, never an incident), `parcels/QX-9124.json`, `flights/VA617.json`, `rates.json`, `match.json`, `orders.json`, `wind.json`, `releases.atom`. They never change.
+
 ## No real hosts (ALT-7758)
 
 No page here loads or links a real outside host. `hosted/index.html` opens its payment page `hosted.html` on this site (`#hosted=<url>` for one of our fakes on another host); the `browser/redirect-portal-*.html` pages lead to `browser/portal.html`. A secret fake path is only ever passed in a `#fragment`, never in the query.
