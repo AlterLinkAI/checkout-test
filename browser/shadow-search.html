@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Quill Search (test) - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}pre{background:#f4f4f4;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body data-page="shadow-search">
+<h1>Quill Search (TEST ONLY)</h1>
+<p>A made-up search start page. The search field and its button live inside a CLOSED shadow root of <code>&lt;quill-search&gt;</code>, so the page's own script cannot find them. Searching does nothing; nothing is sent anywhere.</p>
+<quill-search></quill-search>
+<h2>Page state</h2>
+<pre id="state-json" aria-label="Page state JSON"></pre>
+<script>
+var state = {field: '', searched: false};
+function show() { document.getElementById('state-json').textContent = JSON.stringify(state); window.__pageState = state; }
+customElements.define('quill-search', class extends HTMLElement {
+  constructor() {
+    super();
+    var root = this.attachShadow({mode: 'closed'});
+    root.innerHTML = '<style>input{font:inherit;width:320px;padding:6px}</style>' +
+      '<input type="search" aria-label="Search" placeholder="Search the test index">' +
+      ' <button type="button">Search</button>';
+    var input = root.querySelector('input');
+    input.addEventListener('input', function () { state.field = input.value; show(); });
+    root.querySelector('button').addEventListener('click', function () { state.searched = true; show(); });
+  }
+});
+show();
+</script>
+</body>
+</html>

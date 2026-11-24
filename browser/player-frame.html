@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Video player - browser test</title>
+<style>body{font:14px/1.4 system-ui,sans-serif;margin:0;background:#111;color:#eee}.bar{display:flex;gap:8px;align-items:center;padding:8px}h2{font-size:16px;margin:8px}button{font:inherit}</style>
+</head>
+<body data-page="player-frame">
+<h2 id="title">Lantern Walk, Episode 3 (test video)</h2>
+<div class="bar">
+  <button id="play" aria-label="Play">Play</button>
+  <button id="mute" aria-label="Mute">Mute</button>
+  <span id="time">0:00 / 3:12</span>
+</div>
+<p id="status" role="status" style="margin:8px">Paused.</p>
+<script>
+document.getElementById('play').onclick = function () {
+  var s = document.getElementById('status');
+  var playing = this.textContent === 'Play';
+  this.textContent = playing ? 'Pause' : 'Play';
+  s.textContent = playing ? 'Playing (test, no real video).' : 'Paused.';
+};
+document.getElementById('mute').onclick = function () {
+  this.textContent = this.textContent === 'Mute' ? 'Unmute' : 'Mute';
+};
+</script>
+</body>
+</html>

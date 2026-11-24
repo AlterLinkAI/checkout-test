@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Wallet button demo (test) - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}button{font:inherit;padding:8px 16px}</style>
+</head>
+<body data-page="pay-button">
+<h1>Wallet button demo (TEST ONLY)</h1>
+<p>A made-up merchant demo. The button opens the test wallet's payment sheet in a new window on this site. Nothing is paid and nothing is sent anywhere.</p>
+<button id="pay" onclick="window.open('pay-sheet.html', 'paysheet', 'popup,width=420,height=560')">Pay with Test Wallet</button>
+<p id="status" role="status">No sheet opened yet.</p>
+<script>document.getElementById('pay').addEventListener('click', function () { document.getElementById('status').textContent = 'Payment sheet requested.'; });</script>
+</body>
+</html>

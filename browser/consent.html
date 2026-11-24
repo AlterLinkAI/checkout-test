@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Hallerberg Courier (test) - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}#cover{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}#cover iframe{width:640px;height:220px;border:0;background:#fff;margin-bottom:24px}</style>
+</head>
+<body data-page="consent">
+<h1>Hallerberg Courier (TEST ONLY)</h1>
+<p>A made-up news front page. A privacy banner covers it; the banner sits in a sandboxed frame without <code>allow-same-origin</code> (an opaque origin, so cross-origin to this page). Choosing either button removes the banner. Nothing is sent anywhere.</p>
+<h2>Harbour lanterns lit for the winter walk</h2>
+<p>The town's harbour lanterns were lit on Friday for the winter walk, which runs every evening this week.</p>
+<div id="cover"><iframe title="Privacy choices" sandbox="allow-scripts" src="consent-frame.html"></iframe></div>
+<p id="status" role="status">Privacy banner shown.</p>
+<script>
+window.addEventListener('message', function (e) {
+  if (e.data === 'accept' || e.data === 'reject') {
+    document.getElementById('cover').remove();
+    document.getElementById('status').textContent =
+      e.data === 'accept' ? 'Banner closed: cookies accepted.' : 'Banner closed: cookies rejected.';
+  }
+});
+</script>
+</body>
+</html>

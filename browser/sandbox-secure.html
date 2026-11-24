@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Secure Area - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}</style>
+<script>
+// Only a browser that logged in on sandbox-login.html sees this page; any
+// other is sent back with the practice site's "must login" message.
+if (sessionStorage.getItem('sandbox-login') !== '1') location.replace('sandbox-login.html#must-login');
+</script>
+</head>
+<body data-page="sandbox-secure">
+<h1>Secure Area (TEST ONLY)</h1>
+<p id="flash" role="status">You logged into a secure area!</p>
+<p>Welcome to the Secure Area. When you are done click logout below.</p>
+<p><a href="sandbox-login.html" onclick="sessionStorage.removeItem('sandbox-login')">Logout</a></p>
+</body>
+</html>

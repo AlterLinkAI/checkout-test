@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Embedded video - browser test</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}iframe{border:1px solid #ccc;width:560px;height:315px}</style>
+</head>
+<body data-page="player">
+<h1>Embedded video (TEST ONLY)</h1>
+<p>A made-up lesson page with a video player embedded from another origin. The player sits in a sandboxed frame without <code>allow-same-origin</code>, so its origin is opaque: this page's own script cannot read into it. Nothing is sent anywhere.</p>
+<iframe title="Video player" sandbox="allow-scripts" src="player-frame.html"></iframe>
+</body>
+</html>
