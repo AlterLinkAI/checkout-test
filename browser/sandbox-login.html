@@ -8,7 +8,7 @@
 </head>
 <body data-page="sandbox-login">
 <h1>Login Page (TEST ONLY)</h1>
-<p>This is a made-up practice site. Enter <b>practice-user</b> for the username and <b>Practice-Pass-42</b> for the password. Nothing is sent anywhere: a right login is remembered in this browser only (sessionStorage), and <a href="sandbox-secure.html">the secure area</a> shows only to a browser that logged in.</p>
+<p>This is a made-up practice site. Enter <b>practice-user</b> for the username and <b>Practice-Pass-42</b> for the password. Nothing is sent anywhere: a right login is remembered in this browser only (a cookie for one hour, like the practice site's session), and <a href="sandbox-secure.html">the secure area</a> shows only to a browser that logged in.</p>
 <p id="flash" role="status"></p>
 <form id="f">
   <label>Username <input id="username" name="username" autocomplete="username"></label>
@@ -22,7 +22,7 @@ document.getElementById('f').addEventListener('submit', function (e) {
   e.preventDefault();
   var ok = document.getElementById('username').value === 'practice-user' &&
            document.getElementById('password').value === 'Practice-Pass-42';
-  if (ok) { sessionStorage.setItem('sandbox-login', '1'); location.href = 'sandbox-secure.html'; }
+  if (ok) { document.cookie = 'sandbox-login=1; path=/checkout-test/browser/; max-age=3600; SameSite=Lax'; location.href = 'sandbox-secure.html'; }
   else { flash.textContent = 'Your username or password is invalid!'; }
 });
 </script>

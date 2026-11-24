@@ -8,13 +8,13 @@
 <script>
 // Only a browser that logged in on sandbox-login.html sees this page; any
 // other is sent back with the practice site's "must login" message.
-if (sessionStorage.getItem('sandbox-login') !== '1') location.replace('sandbox-login.html#must-login');
+if (!/(?:^|; )sandbox-login=1(?:;|$)/.test(document.cookie)) location.replace('sandbox-login.html#must-login');
 </script>
 </head>
 <body data-page="sandbox-secure">
 <h1>Secure Area (TEST ONLY)</h1>
 <p id="flash" role="status">You logged into a secure area!</p>
 <p>Welcome to the Secure Area. When you are done click logout below.</p>
-<p><a href="sandbox-login.html" onclick="sessionStorage.removeItem('sandbox-login')">Logout</a></p>
+<p><a href="sandbox-login.html" onclick="document.cookie = 'sandbox-login=; path=/checkout-test/browser/; max-age=0'">Logout</a></p>
 </body>
 </html>
