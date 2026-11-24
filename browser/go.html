@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- ALT-7758 (AlterLink): our own forward page, in place of a public redirect service. It forwards at once (meta refresh and script) to arrived.html with the same ?via=. Nothing is sent anywhere. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Forwarding - browser test</title>
+<meta http-equiv="refresh" content="0;url=arrived.html?via=l-redirect">
+<script>
+const via = new URLSearchParams(location.search).get("via") || "l-redirect";
+location.replace("arrived.html?via=" + encodeURIComponent(via));
+</script>
+</head>
+<body><p>TEST SITE: forwarding to the arrival page.</p></body>
+</html>
