@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Club test - profile and sign in</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:520px}
+label,input,button{display:block;margin:10px 0}</style>
+</head>
+<body>
+<main>
+<h1>Harbor Club test</h1>
+<p>Test page (ALT-7397): any made-up display name and password work here.</p>
+<form id="f"><div id="fields"></div><button type="submit">Save and sign in</button></form>
+<p id="status">Display name now: (empty). Fields redrawn 0 times.</p>
+</main>
+<script>
+// TEST ONLY: a made-up profile and sign-in form; nothing is sent anywhere.
+// For the first 45 s the fields are redrawn every 3 s as fresh elements
+// (their values kept), like a page that re-renders its form, so a field
+// found a moment ago may no longer be on the page. Then they stay put.
+banner();
+const fields = document.getElementById("fields");
+const status = document.getElementById("status");
+let redrawn = 0;
+let name = "";
+let password = "";
+function show() {
+  status.textContent = "Display name now: " + (name || "(empty)") + ". Fields redrawn " + redrawn + " times.";
+}
+function draw() {
+  fields.innerHTML = '<label>Display name <input name="display_name" type="text" autocomplete="nickname"></label>' +
+    '<label>Password <input name="password" type="password" autocomplete="current-password"></label>';
+  const n = fields.querySelector('[name="display_name"]');
+  const p = fields.querySelector('[name="password"]');
+  n.value = name;
+  p.value = password;
+  n.addEventListener("input", () => { name = n.value; show(); });
+  p.addEventListener("input", () => { password = p.value; });
+}
+draw();
+const started = Date.now();
+const timer = setInterval(() => {
+  if (Date.now() - started > 45000) { clearInterval(timer); return; }
+  redrawn += 1;
+  draw();
+  show();
+}, 3000);
+document.getElementById("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  status.textContent = password ? "Saved: " + (name || "(no name)") + ", signed in." : "Enter your password to sign in.";
+});
+</script>
+</body>
+</html>
