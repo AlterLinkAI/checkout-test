@@ -140,6 +140,10 @@ Pages that core's eval cases (`alterlink-core` `src/alterlink_core/eval/golden/c
 - A hit lists two results, the match first ("Lumen Star Mug (teal, yellow star)", ...) and a look-alike decoy in other colours; a miss shows "No exact match" and the three decoys. Every result image is under `imagesearch/results/`.
 - `#state-json` / `window.__pageState`: chosen file, bytes, sha256, matched photo, searches.
 
+## Outside sign-in (ALT-7717)
+
+`outside-sign-in/` (Maple Savings test): a made-up bank's sign-in with an email-or-phone field, a password field and Sign in. On a test cell, core's test-cell switch makes this path count as an outside service's page, so the live check of the outside sign-in gate runs here and not on a real bank. Submitting it only shows "signed in (test)" and a made-up balance; nothing is sent anywhere.
+
 ## No real hosts (ALT-7758)
 
 No page here loads or links a real outside host. `hosted/index.html` opens its payment page `hosted.html` on this site (`#hosted=<url>` for one of our fakes on another host); the `browser/redirect-portal-*.html` pages lead to `browser/portal.html`. A secret fake path is only ever passed in a `#fragment`, never in the query.
