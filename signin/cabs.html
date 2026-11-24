@@ -11,7 +11,7 @@
 <main id="main"></main>
 <script>
 // The app side of the chooser case: its only sign-in is "Continue with
-// GitHub (test)", whose chooser (chooser.html) comes back here with the row
+// Kestrel ID (test)", whose chooser (chooser.html) comes back here with the row
 // picked. The number shown belongs to THAT account.
 banner();
 const main = document.getElementById("main");
@@ -21,7 +21,7 @@ if (row) {
   main.innerHTML = "<h1>Harbor Cabs test</h1><h2>Your account</h2><p>Signed in as " + row.login +
     ".</p><p>Membership number: <b>" + memberNumber("H", row.login) + "</b></p>";
 } else {
-  main.innerHTML = '<h1>Harbor Cabs test</h1><h2>Sign in</h2><p><a href="chooser.html">Continue with GitHub (test)</a></p>';
+  main.innerHTML = '<h1>Harbor Cabs test</h1><h2>Sign in</h2><p><a href="chooser.html">Continue with Kestrel ID (test)</a></p>';
 }
 </script>
 </body>
