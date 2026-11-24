@@ -21,12 +21,13 @@
 <p><a class="btn" id="checkout" href="#">Checkout</a></p>
 </main>
 <script>
-// The hosted-checkout flow (ALT-6470): the shop's cart on this host, the
-// payment page on another host (a provider-like page served from the same
-// repo by a different host). ?hosted=<url> overrides it.
+// The hosted-checkout flow (ALT-6470): the shop's cart, then the payment
+// page. By default the payment page is ours on this host (ALT-7758: no real
+// host); a run that needs it on another host passes #hosted=<url> of one
+// of our fakes (a fragment: never sent to a server); ?hosted= still works.
 const q = new URLSearchParams(location.search);
-document.getElementById("checkout").href = q.get("hosted")
-  || "https://raw.githack.com/AlterLinkAI/checkout-test/main/hosted/hosted.html";
+document.getElementById("checkout").href = new URLSearchParams(location.hash.slice(1)).get("hosted") || q.get("hosted")
+  || "hosted.html";
 </script>
 </body>
 </html>

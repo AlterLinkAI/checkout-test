@@ -1,12 +1,12 @@
 <!doctype html>
-<!-- ALT-7153 test fixture, test cells only (on a non-test cell it would really load https://my.telegram.org/). No credentials, no tracking. -->
+<!-- ALT-7153 test fixture, test cells only (it leads to our made-up developer portal, portal.html; ALT-7758: no real host). No credentials, no tracking. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>TEST SITE - redirect check: js</title>
 <meta name="robots" content="noindex">
 <script>
-setTimeout(() => location.replace('https://my.telegram.org/'), 1000);
+setTimeout(() => location.replace('https://alterlinkai.github.io/checkout-test/browser/portal.html'), 1000);
 </script>
 </head>
 <body>

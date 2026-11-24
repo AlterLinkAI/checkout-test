@@ -15,7 +15,7 @@ li{margin:6px 0}#far{margin-top:1400px}</style>
   <li><a id="l-newtab" href="arrived.html?via=l-newtab" target="_blank" rel="noopener">Open the arrival page in a new tab</a></li>
   <li><a id="l-js" href="#" data-to="arrived.html?via=l-js">Open the arrival page by script</a> (the click runs code first)</li>
   <li><a id="l-anchor" href="#far">Jump to the bottom of this page</a></li>
-  <li><a id="l-redirect" href="https://httpbin.dev/redirect-to?url=https%3A%2F%2Falterlinkai.github.io%2Fcheckout-test%2Fbrowser%2Farrived.html%3Fvia%3Dl-redirect">Open the arrival page through a public redirect</a></li>
+  <li><a id="l-redirect" href="go.html?via=l-redirect">Open the arrival page through a redirect</a></li>
   <li><a id="l-private" href="http://10.0.0.1/admin">A link to a private address</a></li>
   <li><a id="l-mailto" href="mailto:test.inbox@example.com?subject=Browser%20test">Write to the test inbox</a></li>
   <li>Same text twice: <a id="l-dup-1" href="arrived.html?via=l-dup-1">Details</a> and <a id="l-dup-2" href="arrived.html?via=l-dup-2">Details</a></li>
@@ -27,6 +27,11 @@ li{margin:6px 0}#far{margin-top:1400px}</style>
 <script>
 // Every click is kept for this tab (sessionStorage), so the arrival page can
 // show the trail too.
+// The redirect link goes through our own forward page (ALT-7758: no real
+// host); #redirect=<url> (a fragment, never sent to a server; e.g. the
+// sign-in fake's /redir) replaces it.
+const redirect = new URLSearchParams(location.hash.slice(1)).get("redirect");
+if (redirect && /^https:\/\//.test(redirect)) document.getElementById("l-redirect").href = redirect;
 pageState.clicks = JSON.parse(sessionStorage.getItem("links.clicks") || "[]");
 document.querySelectorAll("a[id^=l-]").forEach((a) => a.addEventListener("click", (e) => {
   pageState.clicks.push({ id: a.id, text: a.textContent, at: now() });

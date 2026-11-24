@@ -14,7 +14,7 @@ if (new URLSearchParams(location.search).get("mode") === "loop-now") { for (;;) 
 <h1>Wedged tab (TEST ONLY)</h1>
 <p>Modes: <code>?mode=loop</code> (default; renders, then the page's script spins forever after <code>after</code> ms, default 2000),
 <code>?mode=loop-now</code> (spins before anything renders), <code>?mode=never</code> (renders, but the load event
-never comes: a picture waits on a server that answers after about 150 s, and then another one does).</p>
+never comes while a picture waits on <code>#hold=&lt;url&gt;</code>, a server of ours that never answers, e.g. the sign-in fake's <code>/doc/never</code>; each answer starts the next wait).</p>
 <p id="status" role="status">Loading...</p>
 <p><button type="button" id="ping">Ping</button> <span id="pong">Not pinged.</span></p>
 <h2>Page state</h2>
@@ -33,18 +33,21 @@ document.getElementById("ping").addEventListener("click", () => {
   show();
 });
 if (mode === "never") {
-  // A sub-resource that holds the load event: public delay servers (no data),
-  // the same ones the lease page uses. Each answer starts the next wait.
+  // A sub-resource that holds the load event: #hold=<url> (a fragment: never sent to a server), one of our fakes
+  // that never answers (ALT-7758: no public delay server). Each answer starts
+  // the next wait.
+  const holdUrl = new URLSearchParams(location.hash.slice(1)).get("hold") || "";
   pageState.loaded = false;
   record("waiting for load");
   show("Rendered; the load event has not come (the page keeps loading).");
   const hold = () => {
     const img = new Image();
     img.onload = img.onerror = () => { record("hold answered"); show(); hold(); };
-    img.src = "https://httpbin.dev/delay/150?t=" + Date.now();
+    img.src = holdUrl + (holdUrl.includes("?") ? "&" : "?") + "t=" + Date.now();
     document.body.appendChild(img).style.display = "none";
   };
-  hold();
+  if (/^https:\/\//.test(holdUrl)) hold();
+  else { pageState.loaded = null; record("no hold url"); show("mode=never needs #hold=<https url of our never-answering fake>; nothing is loaded."); }
   window.addEventListener("load", () => { pageState.loaded = true; record("load"); show("Loaded (a hold answered)."); });
 } else {
   pageState.wedge_at = new Date(Date.now() + after).toISOString().replace(/\.\d+Z$/, "Z");
