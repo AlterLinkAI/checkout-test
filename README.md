@@ -15,7 +15,7 @@ Keep GitHub Pages published and the repo unarchived (ALT-7405). Every cell's bro
 
 This repo has no CI. Its PRs merge through the AlterLink workspace tool like every other repo: `python3 dev/merge_chain/merge_chain.py AlterLinkAI/checkout-test <PR> --card ALT-<n>` (ALT-6608), never by hand.
 
-`lease/` (ALT-5057): an offer page whose three documents open in a new tab. Offer and schedule answer at once; the general terms come through five 5 s delay hops (app.requestly.io delay, httpbin.dev redirect-to), about 25-30 s before the first byte, as a slow document server. "Old contract" opens httpbin.dev/delay/150, a server that sends nothing for 150 s. PDFs are made up and carry `BL-TEST-<doc>` references.
+`lease/` (ALT-5057): an offer page whose three documents open in a new tab. Offer and schedule answer at once. The general terms and the "Old contract" (a server that sends nothing) come from the page's `#slow=<url>&never=<url>` fragment, the sign-in fake's `/doc/slow` and `/doc/never` (ALT-7758: no public delay server); without `#slow` the terms open at once, without `#never` the archive row is hidden. PDFs are made up and carry `BL-TEST-<doc>` references.
 `probe.html` (ALT-7405): a static page with the title "AlterLink browser probe" that every cell's browser probe (core `tools/browser/probe.py`) opens every half hour instead of a third-party site. It loads nothing else. Keep its title and keep it published while core's probe names it.
 
 ## Sign-in steps (ALT-5500)
@@ -51,9 +51,9 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 
 `browser/` holds five made-up pages for live checks of the twin's browser. Each shows a status line (`#status`) and its whole state as JSON (`#state-json`, also `window.__pageState`). Nothing is sent anywhere.
 
-- `wedge.html`: a tab that stops answering. `?mode=loop` (default) renders, then its script spins forever after `?after=` ms (default 2000); `?mode=loop-now` spins before anything renders; `?mode=never` renders but the load event never comes (a picture waits on a public delay server, again and again).
+- `wedge.html`: a tab that stops answering. `?mode=loop` (default) renders, then its script spins forever after `?after=` ms (default 2000); `?mode=loop-now` spins before anything renders; `?mode=never#hold=<url>` renders but the load event never comes (a picture waits on `<url>`, our never-answering fake such as the sign-in fake's `/doc/never`, again and again; without `#hold` nothing is loaded).
 - `private.html`: asks for pictures, a script, two fetches and a frame from private and loopback names (10.0.0.1, 192.168.1.1, localhost, 127.0.0.1). Each row says what the page saw: error, no answer in 20 s, or (a frame) a load event that blocked frames fire too.
-- `links.html` -> `arrived.html`: same tab, new tab, a link that runs code first, an anchor, a public redirect, a private address, a mailto, and two links with the same text. The arrival page names the link it came from (`via`).
+- `links.html` -> `arrived.html`: same tab, new tab, a link that runs code first, an anchor, a redirect (our own `go.html`; `#redirect=<url>` swaps in a server redirect such as the sign-in fake's `/redir`), a private address, a mailto, and two links with the same text. The arrival page names the link it came from (`via`).
 - `form.html` -> `submitted.html`: a contact form with required fields; `?fail=1` refuses the first full submit, `?slow=<ms>` waits before it leaves. The result page lists the fields and a `BT-FORM-<6 digits>` reference.
 - `download.html`: CSV and PDF file links, the PDF in a new tab (viewer, no download event), a file made in the page, a delayed one (3 s), and one behind a confirm step. Every file carries a `BT-TEST-...` reference in its text.
 - `frames.html`: three voucher fields that a plain page read does not reach: in a same-origin frame (`frame-inner.html`), in an open shadow root and in a closed shadow root. Each "Apply" is recorded in `applied`; the status counts "N of 3 applied".
@@ -117,3 +117,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 `outage/title-6859.html` (title "Fernhill Test Notice Board") answers 200 when opened plainly. `outage/title-6859.html?img=https://alterlinkai.github.io/checkout-test/outage/shape-6859.png` hands it a picture's address as a parameter, a shape the twin's address guard refuses (ALT-6744), so "open it and tell me the title" is a blocked turn on our own page. `shape-6859.png` is a made-up 8x8 light-blue square.
 
 `lease/tf.html#slow=<url>&never=<url>` (ALT-5057): the same offer shape, its two new-tab documents taken from the fragment, so a check can point them at the test fakes host without the fakes' secret path ever being in this repo or sent to GitHub.
+
+## No real hosts (ALT-7758)
+
+No page here loads or links a real outside host. `hosted/index.html` opens its payment page `hosted.html` on this site (`#hosted=<url>` for one of our fakes on another host); the `browser/redirect-portal-*.html` pages lead to `browser/portal.html`. A secret fake path is only ever passed in a `#fragment`, never in the query.
