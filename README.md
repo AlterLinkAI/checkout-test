@@ -123,6 +123,7 @@ This repo has no CI. Its PRs merge through the AlterLink workspace tool like eve
 
 Pages that core's eval cases (`alterlink-core` `src/alterlink_core/eval/golden/cases.yaml`) open in place of real sites, so a case runs the same on the stand and on a test cell, whose page rule admits only this site and our fakes. All made up; nothing is sent anywhere.
 
+- `browser/late-frame.html` (ALT-8186): "Lumen Test Shop", total 7,99 €, its Pay in a sandboxed frame without `allow-same-origin` (`late-frame-pay.html`, an opaque origin, so cross-origin to the page). With `#late=1` the page around the frame takes the first press on it and lets the frame have input 0.3 s later, as before a frame has drawn. `#status` and `#state-json` show `payments` (each Pay press in the frame) and `pressesOnPage` (presses the page around the frame took). Nothing is charged or sent.
 - `browser/player.html` (ALT-1006): a lesson page with a video player in a sandboxed frame without `allow-same-origin` (`player-frame.html`: title "Lantern Walk, Episode 3", Play, Mute, `0:00 / 3:12`). The frame's origin is opaque, so the page's own script cannot read into it.
 - `browser/shadow-search.html` (ALT-1006): "Quill Search": the search field and button sit in a CLOSED shadow root of `<quill-search>`. `#state-json` shows what was typed and whether Search was pressed.
 - `browser/windows.html` -> `windows-new.html`: a "Click Here" link that opens a second window headed "New Window".
