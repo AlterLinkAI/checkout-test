@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><title>Payment (test)</title>
+<style>body{font:15px/1.5 system-ui,sans-serif;margin:12px}</style></head>
+<body>
+<p><strong>Lumen Test Shop</strong>: total 7,99 € (test only, nothing is charged)</p>
+<form>
+<label>Card number <input name="cardnumber" autocomplete="cc-number" value="4242 4242 4242 4242"></label>
+<p><button>Pay 7,99 €</button></p>
+</form>
+<p id="done" role="status">Not paid.</p>
+<script>
+var n = 0;
+document.querySelector('form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  n += 1;
+  document.getElementById('done').textContent = 'Test payment made (' + n + ' time' + (n === 1 ? '' : 's') + ').';
+  parent.postMessage('paid', '*');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Lumen Test Shop - checkout (test)</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:24px;max-width:720px}#box{position:relative;width:600px;height:320px}#box iframe{width:600px;height:320px;border:1px solid #ccc}#late{position:absolute;inset:0}</style>
+</head>
+<body data-page="late-frame">
+<h1>Lumen Test Shop (TEST ONLY)</h1>
+<p>A made-up shop. The payment form sits in a sandboxed frame without <code>allow-same-origin</code> (an opaque origin, so cross-origin to this page), as a payment provider's frame would. Nothing is sold, charged or sent anywhere. With <code>#late=1</code> the page around the frame takes the first press on it and lets the frame have input 0.3 s later, as on a slow device before the frame has drawn (ALT-8186).</p>
+<div id="box"><iframe title="Payment" sandbox="allow-scripts allow-forms" src="late-frame-pay.html"></iframe></div>
+<p id="status" role="status">Order: 1 test lamp, total 7,99 €. Payments made: 0.</p>
+<pre id="state-json"></pre>
+<script>
+var state = {late: /late=1/.test(location.hash), pressesOnPage: 0, payments: 0};
+window.__pageState = state;
+function show() {
+  document.getElementById('status').textContent = 'Order: 1 test lamp, total 7,99 €. Payments made: ' + state.payments + '.';
+  document.getElementById('state-json').textContent = JSON.stringify(state);
+}
+if (state.late) {
+  var late = document.createElement('div');
+  late.id = 'late';
+  late.addEventListener('pointerdown', function () {
+    state.pressesOnPage += 1; show();
+    setTimeout(function () { late.remove(); }, 300);
+  });
+  document.getElementById('box').appendChild(late);
+}
+window.addEventListener('message', function (e) {
+  if (e.data === 'paid') { state.payments += 1; show(); }
+});
+show();
+</script>
+</body>
+</html>
