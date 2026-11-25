@@ -7,9 +7,12 @@
 <style>body{font:15px/1.4 system-ui,sans-serif;margin:16px}button{font:inherit;margin-right:8px}</style>
 </head>
 <body data-page="consent-frame">
+<!-- The button classes are the ones Sourcepoint, the consent platform of the
+     real site this case was written for, renders (ALT-8043): reject
+     sp_choice_type_13, accept sp_choice_type_11. Made up otherwise. -->
 <h2>We value your privacy (test)</h2>
 <p>This made-up site would like to use cookies for ads and measurement.</p>
-<button id="accept" onclick="parent.postMessage('accept', '*')">Accept all</button>
-<button id="reject" onclick="parent.postMessage('reject', '*')">Reject all</button>
+<button id="accept" class="message-component message-button no-children sp_choice_type_11" onclick="parent.postMessage('accept', '*')">Accept all</button>
+<button id="reject" class="message-component message-button no-children sp_choice_type_13" onclick="parent.postMessage('reject', '*')">Reject all</button>
 </body>
 </html>
