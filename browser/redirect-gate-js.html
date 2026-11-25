@@ -1,0 +1,15 @@
+<!doctype html>
+<!-- ALT-7153 test fixture, test cells only (it leads to portal-gate.testfakes.altnet.dev, our own host that a test cell's TEST_PORTAL_HOSTS lists, so core's portal gate must refuse it; no real host). No credentials, no tracking. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TEST SITE - gate check: js</title>
+<meta name="robots" content="noindex">
+<script>
+setTimeout(() => location.replace('https://portal-gate.testfakes.altnet.dev/'), 1000);
+</script>
+</head>
+<body>
+<h1>TEST SITE - gate check: js</h1>
+</body>
+</html>
