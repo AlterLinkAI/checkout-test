@@ -43,3 +43,27 @@ class SandboxLogin(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ConsentFrame(unittest.TestCase):
+    """browser_consent_in_iframe (ALT-8043): the real site served its banner
+    from a consent platform (Sourcepoint) in a cross-origin frame, with the
+    platform's own markup. The stand-in carries that markup, so the cell's
+    consent pass meets what it would meet there; bare ids it was never meant
+    to know left the case measuring nothing."""
+
+    def test_the_banner_frame_carries_the_platforms_reject_markup(self) -> None:
+        frame = (ROOT / "browser" / "consent-frame.html").read_text()
+        reject = re.search(r'<button[^>]*id="reject"[^>]*>', frame)
+        accept = re.search(r'<button[^>]*id="accept"[^>]*>', frame)
+        self.assertIsNotNone(reject)
+        self.assertIsNotNone(accept)
+        self.assertIn("sp_choice_type_13", reject.group(0))
+        self.assertIn("sp_choice_type_11", accept.group(0))
+
+    def test_the_banner_stays_in_an_opaque_origin_frame(self) -> None:
+        page = (ROOT / "browser" / "consent.html").read_text()
+        frame = re.search(r"<iframe[^>]*>", page)
+        self.assertIsNotNone(frame)
+        self.assertIn('sandbox="allow-scripts"', frame.group(0))
+        self.assertNotIn("allow-same-origin", frame.group(0))
