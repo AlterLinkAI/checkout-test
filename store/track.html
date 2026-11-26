@@ -9,7 +9,18 @@
 <body style="font:16px/1.5 system-ui,sans-serif;margin:0">
 <div role="alert" style="background:#b00020;color:#fff;padding:8px 12px">TEST SITE &mdash; made-up store and orders, nothing is sold.</div>
 <nav id="header" style="padding:8px 12px;border-bottom:1px solid #ddd"></nav>
-<main id="main" style="padding:24px"></main>
+<main id="main" style="padding:24px">
+<!-- TEST ONLY (ALT-6424): the same answers as plain HTML, for a reader that runs
+     no JavaScript (a page fetch). Keep in step with ORDERS in shop.js. -->
+<h1>Parcel tracking, all test orders</h1>
+<ul>
+<li>Order T-1005: parcel delivered on 2026-11-21. Tracking number: TEST-1005.</li>
+<li>Order T-1004: cancelled, no parcel.</li>
+<li>Order T-1003: parcel delivered on 2026-11-16. Tracking number: TEST-1003.</li>
+<li>Order T-1002: parcel delivered on 2026-11-13. Tracking number: TEST-1002.</li>
+<li>Order T-1001: parcel delivered on 2026-11-03. Tracking number: TEST-1001.</li>
+</ul>
+</main>
 <script>
 header();
 // TEST ONLY (ALT-6424): made-up parcel tracking for a delivered order.
