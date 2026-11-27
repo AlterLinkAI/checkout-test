@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Harbor Notes test</title>
+<script src="fixture.js"></script>
+<style>body{font:16px/1.5 system-ui,sans-serif;margin:0}main{padding:24px;max-width:460px}</style>
+</head>
+<body>
+<main id="main"></main>
+<script>
+// ALT-8024 / ALT-7565: an app whose only sign-in is "Sign in with Google
+// (test)". The button opens the fake Google's account chooser, which the
+// run names in the fragment: #to=https://testfakes.altnet.dev/<path>. The
+// path is a test secret: the fragment never reaches a server, and the page
+// drops it from the address bar at once. Any other host is refused, so this
+// page never sends anyone to a real Google. The fake returns here with
+// ?code=..., and the page shows the signed-in state.
+banner();
+const main = document.getElementById("main");
+const here = location.origin + location.pathname;
+const q = new URLSearchParams(location.search);
+const to = new URLSearchParams(location.hash.slice(1)).get("to") || sessionStorage.getItem("google-test-to") || "";
+if (location.hash) history.replaceState(null, "", here + location.search);
+let base = "";
+try {
+  const u = new URL(to);
+  if (u.protocol === "https:" && u.hostname === "testfakes.altnet.dev") base = u.origin + u.pathname.replace(/\/+$/, "");
+} catch (e) {}
+if (base) sessionStorage.setItem("google-test-to", to);
+if (q.get("code")) {
+  main.innerHTML = "<h1>Harbor Notes test</h1><h2>Signed in</h2><p>You are signed in with Google (test). You can close this page.</p>";
+} else if (!base) {
+  main.innerHTML = "<h1>Harbor Notes test</h1><p role=\"alert\">This test page needs its sign-in address. Nothing was opened.</p>";
+} else {
+  const auth = base + "/o/oauth2/v2/auth?" + new URLSearchParams({
+    client_id: "harbor-notes-test",
+    redirect_uri: here,
+    response_type: "code",
+    scope: "openid email",
+    state: Math.random().toString(36).slice(2),
+  });
+  main.innerHTML = "<h1>Harbor Notes test</h1><h2>Sign in</h2><p><a id=\"google\" href=\"\">Sign in with Google (test)</a></p>";
+  document.getElementById("google").href = auth;
+}
+</script>
+</body>
+</html>

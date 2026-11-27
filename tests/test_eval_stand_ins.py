@@ -67,3 +67,14 @@ class ConsentFrame(unittest.TestCase):
         self.assertIsNotNone(frame)
         self.assertIn('sandbox="allow-scripts"', frame.group(0))
         self.assertNotIn("allow-same-origin", frame.group(0))
+
+
+class GoogleTestSignIn(unittest.TestCase):
+    # ALT-8024: the button may only open our fake on testfakes.altnet.dev,
+    # and the secret path in the fragment leaves the address bar at once.
+    def test_only_the_fake_host_and_the_fragment_is_dropped(self) -> None:
+        page = (ROOT / "signin" / "google.html").read_text()
+        self.assertIn('u.hostname === "testfakes.altnet.dev"', page)
+        self.assertIn('u.protocol === "https:"', page)
+        self.assertIn("history.replaceState", page)
+        self.assertNotRegex(page, r"https://accounts\.google\.com")
