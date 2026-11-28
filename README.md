@@ -154,3 +154,7 @@ Pages that core's eval cases (`alterlink-core` `src/alterlink_core/eval/golden/c
 ## No real hosts (ALT-7758)
 
 No page here loads or links a real outside host. `hosted/index.html` opens its payment page `hosted.html` on this site (`#hosted=<url>` for one of our fakes on another host); the `browser/redirect-portal-*.html` pages lead to `browser/portal.html`. A secret fake path is only ever passed in a `#fragment`, never in the query.
+
+## Research sources with a planted conflict (ALT-9167)
+
+`research/en-a..c.html` and `research/ru-a..c.html`: three made-up pages each in English and in Russian about the same made-up bridge (the Kestrel Bridge), our own text, for live checks of a research result's sources. Pages a and b say it opened in 1912; page c says 1921 (the planted conflict). All three say 340 metres (the agreement). The web-search fake lists them for a bridge question.
